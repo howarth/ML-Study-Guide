@@ -1,0 +1,555 @@
+\documentclass[11pt]{article}
+\usepackage{enumerate}
+\usepackage{graphicx}
+\usepackage{fullpage}
+\usepackage{fancyhdr}
+\usepackage{amsmath, amsfonts, amsthm, amssymb}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt plus 1pt}
+\setlength{\headheight}{1pt}
+
+\def\indented#1{\list{}{}\item[]}
+\let\indented=\endlist
+
+
+\newcounter{questionCounter}
+\newcounter{partCounter}[questionCounter]
+\newenvironment{question}[2][\arabic{questionCounter}]{%
+    \addtocounter{questionCounter}{1}%
+    \setcounter{partCounter}{0}%
+    \vspace{.25in} \hrule \vspace{0.5em}%
+        \noindent{\bf #1: #2}%
+    \vspace{0.8em} \hrule \vspace{.10in}%
+}{}
+\renewenvironment{part}[1][\arabic{partCounter}]{%
+    \addtocounter{partCounter}{1}%
+    \vspace{.10in}%
+    \begin{indented}%
+       {\bf (#1)} %
+}{\end{indented}}
+
+
+%%%%%%%%%%%%%%%%% Identifying Information %%%%%%%%%%%%%%%%%
+%% This is here, so that you can make your homework look %%
+%% pretty when you compile it.                           %%
+%%     DO NOT PUT YOUR NAME ANYWHERE ELSE!!!!            %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\myname}{Daniel Howarth, Malcolm Greaves}
+\newcommand{\assignment}{Final Review}
+\newcommand{\course}{Final Review 10-601 Machine Learning S11}
+\newcommand{\andrewid}{dhowarth, mwgreave}
+\newcommand{\myandrew}{dhowarth@andrew.cmu.edu, mwgreave@andrew.cmu.edu}
+\newcommand{\myhwnum}{1}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pagestyle{fancyplain}
+\chead{\course}
+
+\begin{document}
+
+Author(s): Dan Howarth, Malcolm Greaves
+
+
+\begin{question}{Concept Learning: Sorry, the year 1967 and there is no other option.}
+
+\textbf{Representation Power (hard bias):}
+\textbf{Preference bias (soft, rank, search):}
+\textbf{Search feasibility/efficiency:}
+\textbf{Generalization (Will perform well on new data?)}
+
+
+\end{question}
+
+
+\begin{question}{Information Theory}
+
+\underline{Information:}
+$I(E) = log_2 \frac{1}{P(E)}$
+
+Think of information as a level uncertainty about an event. If a probability is very low then the information it gives is high.
+
+Information is additive. The information in single coin flip is 1 bit. In k coin flips there is k bits of information.
+Intuitively, adding logs is the same as multiplying their paramters.
+
+\underline{Entropy:}
+
+$H(S) = \displaystyle\sum\limits_i p_i I(s_i)$ 
+
+Can take integral for continuous functions.
+
+Properties:
+\begin{itemize}
+    \item Entropy is non-negative.
+    \item Invariant with respect to order of inputs
+    \item The further the distribution is from uniform, the lower the entropy.
+\end{itemize}
+
+\underline{Joint Entropy:}
+
+$H(A,B) = \displaystyle\sum\limits_{a,b} P(A=a, B=b)\log\frac{1}{P(A=a, B=b)}$
+
+$H(A,B) < H(A) + H(B)$ TODO: Is this only when dependent?
+
+\underline{Conditional Entropy:}
+
+
+$H(A/B) = \displaystyle\sum\limits_{b}P(B=b)H(A|B=b)$
+
+We can ask "How much is B telling us about A" and we get...
+
+\underline{Mutual Information}
+
+";" means between
+
+$I(A;B) = H(A) - H(A/B)$
+
+
+$I(X;Y;Z) = I(X;Y) - I(X;Y/Z) = H(X,Y,Z) - H(X,Y) - H(X,Z) - H(Y,Z) + H(X) + H(Y) + H(Z)$
+
+Can be negative with three variables.
+
+$I(X;Y) = 0$ and $I(X;Z) = 0$ does not imply $I(X;Y;Z) = 0$
+
+
+
+\end{question}
+
+
+\begin{question}{Decision Trees: Duuuuuude... we don't have to restrict the hypothesis space!}
+
+The \textbf{inductive bias} of decision trees is a preference for small trees over larger trees.
+
+Decision trees are at the core a \textbf{top-down, greedy search} through the space of possible decision trees.
+
+Appropriate for:
+\begin{itemize}
+    \item Instances are rep by attribute-value pairs (as vectors)
+    \item The target function has discrete output value pairs.
+    \item Disjunctive descriptions may be required.
+    \item The training data may contain errors
+    \item The training data may contain missing attribute values
+    \item Train attributes with different costs
+    \item When you do not want to risk "throwing the baby out of the water"
+\end{itemize}
+
+\underline{Limitations:}
+Pure form of ID3 performs no back tracking when searching. This is susceptible in the same way
+that all hill climb searches without back tracking to converge to a locally optimal solutions that are not
+globally optimal
+
+\underline{Capabilities:}
+
+ID3 uses all training examples at each step to perform a statistical analysis of how to
+refine it's current hypothesis. An advantage of this is that the resulting search is less
+sensitive to errors and noise in individual data. 
+
+\textbf{Representation Power (hard bias):}
+
+The hypothesis space of all decision trees is a \emph{complete} space of finite discrete-valued
+functions, relative to the available attributes. 
+
+It only keeps track a single current hypothesis when searching the space of DTs. Cannot keep track 
+of all conistent hypotheses.
+
+\textbf{Preference bias (soft, rank, search):}
+
+The \textbf{inductive bias} of decision trees is a preference for small trees over larger trees. Trees
+that place high information gain attributes near the root are preferred over those that do not.
+
+\underline{Occam's razor:} Prefer the simplest hypothesis that fits that data.
+
+\textbf{Search feasibility/efficiency:}
+
+\textbf{Generalization (Will perform well on new data?)}
+
+
+At each level the tree splits on the attribute that provides the max information gain.
+
+$S_v = \{s\in S | A(s) = v\}$ is the subset of $S$ for which the attribute $A$ has value $v$.
+
+$Gain(S,A) = Entropy(S) - \displaystyle\sum\limits_{v \in Values(A)} \frac{|S_v|}{|S|} Entropy(S_v)$
+
+\underline{Definition:} Given a hypothesis space $H$, a hypothesis $h \in H$ is said to \textbf{overfit}
+the data if $\exists h\prime \in H$, $h \ne h\prime$, such that $h$ has smaller error over the
+training examples but $h\prime$ has smaller error over the entire distribtion of instances.
+
+A DT can overfit the data even if the data is noise free. It is possible for \underline{coincidental regularities} to occur
+in which some attribute happens ot partition the examples very well, despite being unrealted to the actual target
+function. This happens more frequently when there are a small number of examples. 
+
+To avoid over fitting you can do (1) stop growing the tree earlier, before it reaches the point where it perfectly
+classifies the training data or (2) allow the tree to overfit the data, but then post-prune the tree.
+
+The latter has been found to perform better in practice.
+
+Ways to determine the correct final tree size: (1) Use a separate set of examples, distinct from the training
+examples, to evaluate the utility of post-pruning nodes from the tree. (2) Use all the available data for training,
+but apply statistical analasys to estimate whether exapnding (or pruning) a particular node is likely
+to produce a better hypothesis
+
+\underline{Reduced error pruning:}
+
+Pruning a node consists of first removing the subtree at that node and assigning it the most common
+classification of the training examples affiliated with that node. Those nodes that are removed are
+those that do no worse on the pruning set than with the original.
+
+Nodes are pruned iteratively, always choosing the node whose removal most increases the accuracy over the
+validation set. Pruning is continued until harmful.
+
+Pruning can be done top-down or bottom-up.
+
+A drawback of pruning is that you have to give up some training data to be part of the validation set.
+
+\underline{Rule post pruning:}
+
+Each node in a DT represents a conjunction. Rule post pruning takes each conjunction and prunes any preconditions
+whose removal improves accuracy. After this is done for each rule, sort the rules by their estimated accuracy.
+
+The advantages:
+\begin{itemize}
+    \item Can consider to prune a sinle rule instead of a subtree.
+    \item In decision trees when we consider removing nodes near the root it requires messy bookkeeping issues
+    such as how to restructure the tree after removing the node while also retaining the structure of the 
+    subtree below this test.
+    \item Converting to rules improves human readability/understandability.
+\end{itemize}
+
+We can incorporate \textbf{continuous valued functions} be creating classifications such as whether or not
+the number is below or above a certain number. These number too are choosed from their information gain.
+
+\underline{Alternative measure for selecting attributes:}
+There is a natural bias in the information gain measure that favors attributes with many values over
+those with few values. Consider if Date was an attribute. It would pretty much always provide the most information.
+This is because since there are so many (365) possible values it is much more probable for the attribute
+to be able perfectly predict the target attribute over the training data.
+
+A way to avoid this is to change the gain measure. If we incorporate split information (entropy):
+
+$$SplitInformation(S,A) = - \displaystyle\sum\limits_{v\in values(A)}\frac{|S_v|}{|S|}\log_2\frac{|S_v|}{|S|}$$
+
+This is the same thing the entropy of $S$ with respect to the values of attribute $A$. We can now use this
+to give a penalty to those attributes that have uniform distributions:
+
+$$GainRation(S,A) \equiv \frac{Gain(S,A)}{SplitInformation(S,A)}$$
+
+
+\underline{Handling training examples with missing attribute values:}
+
+A simple method is to assign the missing attribute value to the value that is most common among
+the training examples at that node. We could also assign it the value that is most common among
+the training examples at that node with classification $c(x)$.
+
+Another, more complex method is to assign a probability to each value rather than to the most common.
+If $A(x) = 0$ with probability $.4$ and $A(x) = 1$ with probability $.6$ then assign the respective fractions
+of the example to each value. These fractions are used for computing information gain.
+
+\underline{Handling attributes with differing costs:}
+
+This is useful when some attributes are costly the evaluate. For example when classifying symptoms we would not
+want the first decision to be based off of an expensive lab test. To penalize for cost we can modify the gain
+function:
+
+$$\frac{Gain^2(S,A)}{Cost(A)}$$
+
+or maybe possibly
+
+$$\frac{2^{Gain(S,A)}-1}{(Cost(A) + 1)^w}$$
+
+This introduces a \textbf{bias} towards lost cost attributes near the root of the tree. Which biases the search to 
+low cost attributes.
+
+
+
+
+
+\end{question}
+
+
+
+\begin{question}{Nueral Nets: }
+
+\textbf{Appropriate for:}
+
+\begin{itemize}
+    \item Instance are represented by many attribute-value pairs (Can be rep as a vector) 
+    \item The target value may be discrete valued, continuous, or a combination of multiple
+    \item Training data may be noisy or contain errors
+    \item Learning time isn't a concern
+    \item Quick evaluation
+    \item Understandability of underlying decision isn't a concern
+    \item Multilayer networks are awesome for finding features in the data that a human would not pick up on. These
+    features are implicit in the data.
+\end{itemize}
+
+\textbf{Representation Power (hard bias):}
+Much is unknown about which classes of functions can be described with which types of networks.
+
+\begin{itemize}
+    \item Boolean function: Every boolean function can be represented with  two layers
+    \item Continuous functions: Can be approximated with arbitrary low error with two layers
+    \item Aribtary functions: approximated with arbitrary accuracy with two layers
+\end{itemize}
+
+In all, we see that networks with small depths provide a very expressive hypothesis space.
+
+\textbf{Preference bias (soft, rank, search):}
+
+Search bias: Error gradient search.
+
+Inductive bias: Smooth interpolation between data points. In words that make sense: If two training
+examples are positive and have no negative examples between them then BP will classify instances
+between as positive as well.
+
+\textbf{Search feasibility/efficiency:}
+
+\textbf{Generalization (Will perform well on new data?)}
+
+\textbf{Perceptron training rule:}
+
+Proven to converge to a consistent hypothesis given that the training examples are 
+linearly seperable, and a sufficiently small $\eta$ is used.
+
+Update rule: $w_i \leftarrow w_i + \eta (t-o)x_i$
+
+\textbf{Gradient Descent:}
+
+Used when:
+\begin{itemize}
+    \item Hypothesis space contains continuously paramaterized hypotheses
+    \item The error can be differentiated with respect to the hypothesis parameters
+\end{itemize}
+
+Practical difficulties:
+\begin{itemize}
+    \item Can be pretty slow (can take thousands of iterations to converge)
+    \item If there are multiple local minimum then it is not gaurunteed to converge
+\end{itemize}
+
+If training data is not linearly seperable it is proven to converge to best-fit
+approximation.
+
+In general: $\Delta w_i = - \eta \frac{\delta E}{\delta w_i}$
+
+
+\underline{Standard GD:} 
+
+Update rule: $w_i  \leftarrow w_i + \eta \sum_d (t_d - o_d)x_i$
+
+Proven to converge because there is only one global minimum.
+
+\underline{Stochastic GD update rule:}
+
+Error defined as: $E_d = \frac{1}{2}(t_d - o_d)^2$
+
+Update rule: $w_i \leftarrow w_i + \eta(t_d - o_d)x_i$
+
+By taking $\eta$ sufficiently stochastic GD can be made to approximate the true
+gradient descent arbitrarily closely.
+
+Difference between Standard and Stochastic
+\begin{itemize}
+    \item Standard sums over all examples, stochastic only one example per time 
+    \item Summing over all takes more computational time. However with standard we
+    can use a larger $\eta$ (step size) because it calculates the true gradient.
+    \item Stochastic is less prone to fall into local minimum because it uses various
+    $E_d(w)$
+\end{itemize}
+
+\textbf{Backpropagation:}
+
+\underline{English approximation of algorithm:}\\
+For each training example apply it to the network. Calculate the error of the network.
+Compute gradient with resepect to the error. Update all the weights. Repeat.
+
+\underline{Caveats:}\\
+BP can have multiple local minimum. 
+
+\underline{Sigmoid function}
+
+$\sigma(y) = \frac{1}{1+e^-y}$
+
+$\frac{\delta \sigma(y)}{\delta y} = \sigma(y)(1-\sigma(y)$
+
+If we take the sigmoid function and multiply y by a constant k, we can vary
+the steepness of the function.
+
+$E(w) = \frac{1}{2}\displaystyle\sum\limits_{d} \displaystyle\sum\limits_{k\in outputs} (t_kd - o_kd)^2$
+
+\underline{Update rules:}
+
+Unit $j$: $w_i \rightarrow w_i + \eta \delta_j x_{ji}$
+
+$\delta_j$ is the error term for unit $j$
+
+Error term for output unit k: $\delta_k  = o_k(1 - o_k)(t_k - o_k)$
+
+Error term for hidden unit j: $\delta_j =  o_j(1-o_j) \displaystyle\sum\limits_{l \in DS}\delta_lw_{lj}$\\
+For hidden units think of it as the degree to which the unit is responsible for the error.
+
+\underline{Momentum}
+
+Update rule: $\Delta w_{ji}(n) = \eta \delta_j x_{ji} + \alpha \Delta w_{ji}(n-1)$
+
+What's it do?
+\begin{itemize}
+    \item Is the gradient unchanging? Well then let's hurry this thing up.
+    \item Keeps it moving in the same direction, which can keep the ball rolling through local minima
+    \item If the gradient is flat then you wouldn't know where to go. Momentum keeps it rollin'
+\end{itemize}
+
+\underline{Convergence and god damn local minima:}
+
+BP is not gaurunteed to converge to local minima.
+
+For high dimensional networks what may be a local min for one weight is probably not a local
+min with respect to another weight. So as there are more weights, there are more "escape" routes
+in which we can get out of local minimum. 
+
+When the weights are initialized they are close to zero. At these points the sigmoid function
+acts near linearly. This allows for a much smoother gradient surface when the algorithm starts out. 
+When the weights are much different the surface is much more complex. These initial conditions
+prove to be very useful because we hope that by the time the weights reach this point we hope
+that the algorithm has already moved to a location near the global minimum, and local minimum
+at this point are acceptable.
+
+\underline{Heuristics to stay out of local min:}
+\begin{itemize}
+    \item Momentum
+    \item Stochastic over Standard. Each training example has a different error gradient, and each one
+    can have different local minimum, which makes it harder to get stuck in any one of them.
+    \item Training multiple networks, but starting with different weights. This is basically just
+    starting at different parts on the gradient surface. Choose best performer. Or you could use
+    the different networks as voters for the output.
+\end{itemize}
+
+
+\underline{Hidden layer representations:}
+Hidden layers learn/invent features that the human designer did not put into the algorithm. The higher
+number of layers the higher the complexity of the features.
+
+Remember the example of taking 8 binary strings and mapping them to themselves. This was able to be done
+with a single hidden layer of 3 units. Un-surprisingly enough $2^3$ is eight.
+
+\underline{Stopping Criterion, Overfitting, and generalization:}
+
+One idea is to stop when error drops below a threshold. However this ends up being a poor stopping criterion
+because it is very susceptible to overfitting.
+
+Generalization Accuracy - Accuracy at which the network fits examples beyond the training data
+
+Generalization accuracy get worse over while the training error decreases because the network
+can be tuned to the noisy or idiosyncrasies of the training examples, and not tuned to the general
+distribution of instances. The larger the number of weights the more degree of freedom the network
+has to fit these idiosyncrasies.
+
+Why does overfitting occur later? As with when we talked about local minimum, as the weights tend to
+diverge from being close to zero the more complex the gradient surface becomes. Given enough iterations
+the network will fit the noise and will not do a good job at representing the data.
+
+To combat this problem one method is to implement \textbf{weight decay}. Weight decay is simply decreasing each
+weight by some small factor on each iteration. This is equivalent to adding a penalty to large weights in
+the error calculation. \textbf{This biases learning towards small weights, ie smooth surfaces, ie non-complex
+decision surfaces}. A way to do this in the error calculation is:
+
+
+
+
+
+$$E(w) \equiv \frac{1}{2} \displaystyle\sum\limits_{d} \displaystyle\sum\limits_{k\in outputs}(t_{kd} - o{kd})^2 + \gamma
+\displaystyle\sum\limits_{i,j}w_{ji}^2$$
+
+How many iterations should the algorithm perform? It should be enough to produce the lowest error over
+the validation set. This can be done by \textbf{cross validation}: keeping two copies of the network. One which has the weights of
+the best on the validation set so far. The other copy is the current training copy. Once the error
+on the training copy is siginficantly lower than the validation set we can terminate the algorithm
+and output the best network so far with respect to the validation set.
+
+But what about small data sets where we cannot split the data up into training and validation sets? We can
+use the \textbf{k-fold cross validation} approach. This is done by splitting up the data into k sets that
+partition the data. You can then run the procedure k times each time using a different set as the validation
+set. Each time we count the number of iterations that produced the best on the validation set. Average the 
+count and then run BP on the WHOLE set that number of times.
+
+\underline{Alternative Error minimization procedures:}
+When minimizing error we make two decisions: choosing the direction to move and how far to move. Another
+method is \textbf{line search}: once a line is chosen that specifies the direction, choose a distance by finding
+the minimum of the error along this line. Another that builds off this is the \textbf{conjugate gradient} method
+this is done by multiple line searches and I don't know.
+
+
+\underline{Recurrent networks:}
+If we would like the network at time t to depend on time t-1 we can add a hidden unit (b) and a input unit (c). Unit b
+takes all the inputs, including unit c as inputs. It's output is then c at time t+1. This allows b to summarize earlier
+values of the inputs that are abritarily far away in time. You can add several layers between the inputs and b. You could
+also add several more b and c units in parallel.
+
+How do we train? You can "unfold" the network and use BP directly. There are also better ways without unfolding that are
+not included in the book.
+
+\underline{Dynamically Modifying Network Structure:}
+
+Adding units: Add a single fixed unit at a time. Calculate the residual error for each training example. Create a psuedo
+network with one unit and all the inputs to it. For each training example make the target output to be the residual
+error of that training example. Then plop that new unit in the network and keep it's weights fixed.
+
+Removing units:  
+
+\end{question}
+
+
+\begin{question}{Computational Learning Theory:}
+How can we characterize machine learning algorithms? What paradigms can we define in order to answer questions such as, "how many training examples do we need in order to successfully learn a target concept?" And, "what do we define as successful learning?" The fundamental purpose of computational learning theory is to provide frameworks for answering such meta-questions about machine learning algorithms. We will focus on two such frameworks: the probably approximately correct (PAC) learning framework and the mistake bounds framework.
+\\
+We are primarily concerned with characterizing learning algorithms in these two dimensions: (1) sample complexity and (2) computational complexity. Sample complexity refers to the number of training examples needed to successfully learn a target concept. Computational complexity refers to the amount of computational power required to successfully learn a target concept. Note that both of these dimensions must be polynomial.
+\\
+\\
+\underline{True Error} The true error of a hypothesis $h$ with respect to target concept $c$ and true distribution $D^*$ is the probability that $h$ will misclassify an instance drawn uniformly at random from $D^*$ $$error_{D^*} = Pr_{x\in D^*}[c(x) \not = h(x)]$$
+\\
+\\
+\textbf{Definition} A learner $L$ is \textbf{consistent} if $L$ outputs a hypothesis that perfectly fits the training data if the training data is noise-free. Note that perfectly fitting should not be confused with zero training error as zero training error most likely indicates overfitting! In addition, one constraint for a consistent leaner is that the hypothesis space must be guaranteed to include the target concept (that is, $C \subset H$).
+\\
+\\
+\textbf{Definition} A learner $L$ is an \textbf{agnostic} learner if we are not guaranteed that the target concept is inside our hypothesis space. In this case, $L$ need only output the hypothesis in $H$ that has the minimum error over the training examples, defined as $error_D(h)$, where $D$ is the distribution of the training data.
+\\
+\\
+\underline{PAC Learnability} The chief purpose of the PAC learning framework is to define the class of target concepts that can be successfully learned in polynomial time and with a polynomial amount of training examples.
+\\
+\\
+\textbf{Definition:} Let $C$ be a concept class defined over a set of instances $X$, where $|X| = n$. Let $L$ be some learner using hypothesis space $H$. The concept class $C$ is \textbf{PAC-Learnable} by $L$ if for all concepts $c \in C$, distributions $D^*$ over $X$, $0 < \epsilon < \frac{1}{2}$, and $0 < \delta < \frac{1}{2}$, $L$ will output a hypothesis $h$ such that $$P(error_{D^*}(h) \leq \epsilon) = (1 - \delta)$$ in time that is polynomial in $\frac{1}{\epsilon}$, $\frac{1}{\delta}$, $n$, and the number of features necessary to describe a concept $c$.
+\\
+\\
+\underline{Sample Complexity}
+\\
+The growth in the number of training examples required to learn a particular problem--defined as the sample complexity of the learning problem--is an important metric for determining whether or not a concept class is PAC-Learnable. 
+\\
+\textbf{Sample Complexity for Finite Hypothesis Spaces}
+\\
+\\
+For a \textbf{consistent learner} with finite hypothesis space $H$, the number of training examples $m$ required to PAC-Learn the target concept class, assuming that $C \subset H$, is $$m \leq \frac{1}{\epsilon}(\ln |H| + \ln \frac{1}{\delta})$$ It is worthy to note that $m$ grows linearly with respect to $\frac{1}{\epsilon}$ and logarithmically in $\frac{1}{\delta}$ and with respect to the size of the hypothesis space.
+\\
+\\
+If $L$ is an \textbf{agnostic learner}, then the we note that we must guarantee that $$P[error_{D^*}(h) > error_D(h) + \epsilon] \leq 2e^{-2 m \epsilon^2}$$ since we can no longer guarantee that $C \subset H$. Moreover, to ensure that the best hypothesis found by $L$ has an error bounded as above, then we must consider every $h \in H$ as having this error. Thus, we define: $$\delta = P[(\exists h \in H)(error_{D^*}(h) > error_D(h) + \epsilon)] \leq |H|2e^{-2 m \epsilon^2}$$Therefore, the number of training examples $m$ is:$$m \geq \frac{1}{2\epsilon^2}(\ln |H| + \ln \frac{1}{\delta})$$
+\\
+\textbf{Sample Complexity for Infinite Hypothesis Spaces}
+\\
+In the case where $|H| = \infty$, we must define a new measure of the expressivity  of the hypothesis space, which will directly influence the number of training examples necessary to learn a target concept successfully. We will use the VC-Dimension of a hypothesis space as this metric.
+\\
+\\
+\textbf{Definition:} A \textbf{dichotomy} for a hypothesis $h$ and finite set of instances $S$ is a partition of $S$ into distinct subsets, where all instances in each subject are labeled by the hypothesis as belonging to a particular class. In the Boolean case, there are $2^|S|$ dichotomies, and in each dichotomy, all instances are partitioned into one of two sets: positive $\{x \in S | h(x) = 1\}$ and negative $\{ x \ in X | h(x) = 0 \}$
+\\
+\\
+\textbf{Definition:} A set of instances $S \subset X$ is \textbf{shattered} by hypothesis space $H$ if any only if for every dichotomy of $S$, $\exists h \in H$ such that $h$ is consistent with the dichotomy.
+\\
+\\
+\textbf{Definition:} The \textbf{Vapnik-Chervonenkis dimension}, $VC(H)$, of a hypothesis space $H$ defined over a space of instances $X$ is the size of the largest finite subset of $X$ that is shattered by $H$. If an arbitrarily large finite set of $X$ can be shattered by $H$, then $VC(H) = \infty$. Note that for any finite hypothesis space, $VC(H) \leq \log_2 |H|$ since there must be at least $2^d$ distinct hypothesis in $H$ if $VC(H) = d$. 
+\\
+\\
+As described in "Machine Learning" by Mitchell (p217), the minimum number of training examples $m$ required to sufficiently learn a target concept $C$ is $$m \geq \frac{1}{\epsilon}(4 \log_2 \frac{2}{\delta} + 8 VC(H) \log_2(\frac{13}{\epsilon}))$$
+\\
+\\
+Assume that for some concept class $C$, $VC(C) \geq 2$, and that we have a learner $L$, where $0 < \epsilon < \frac{1}{8}$ and $0 < \delta < \frac{1}{100}$. Then, $\exists $ distribution $D^*$ and target concept $c \ in C$ such that if $L$ observes fewer than $max [\frac{1}{\epsilon} \log_2 \frac{1}{\delta}, \frac{VC(C) - 1}{32\epsilon}]$ training examples then $L$ will output a hypothesis $h$ having $error_{D^*}(h) > \epsilon$ with probability at least $\delta$.
+\\
+\\
+\\
+The \textbf{VC-Dimension for directed acyclic layered networks} of perceptrons, $N_P$, is $VC(N_P) \leq 2(r+1)s \log_2(es)$, where $s$ is the number of internal nodes (including all output nodes), $r$ is the maximum input into any single perceptron, and $e$ is Euler's number.
+\end{question}
+\end{document}

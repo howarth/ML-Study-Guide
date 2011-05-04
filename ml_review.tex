@@ -45,19 +45,96 @@
 \chead{\course}
 
 \begin{document}
+.
+\\
+\\
+Created by Dan Howarth and Malcolm Greaves. Adapted significantly from "Machine Learning" by Tom M. Mitchell (1997).
 
-Author(s): Dan Howarth, Malcolm Greaves
+\begin{question}{Overview of learning}
+\textbf{Definition} A computer program is said to \textbf{learn} from experience $E$, with respect to some class of tasks $T$ and performance measure $P$, if the program's performance at tasks in $T$, as measured by $P$, improves with experience $E$. (Mitchell, p2)
+\\
+\\
+Machine learning is about learning the \textbf{function}--the relationship between inputs and outputs--of some underlying target concept or phenomenon. 
+\end{question}
+\\
+\\
+Machine learning in the finite case is called \textbf{classification}, and machine learning in the infinite case is called \textbf{regression}.
+\\
+\\
+The principle questions for all machine learning algorithms:
+\\
+\text{	}\text{	}\textbf{Representation Power (hard bias).}\\
+\text{	}\text{	}\textbf{Preference bias (soft, rank, search).}\\
+\text{	}\text{	}\textbf{Search feasibility/efficiency.}\\
+\text{	}\text{	}\textbf{Generalization (Will perform well on new data?)}\\\
+
 
 
 \begin{question}{Concept Learning: Sorry, the year 1967 and there is no other option.}
-
-\textbf{Representation Power (hard bias):}
-\textbf{Preference bias (soft, rank, search):}
-\textbf{Search feasibility/efficiency:}
-\textbf{Generalization (Will perform well on new data?)}
-
-
+Note that all of the learning algorithms in this section exhibit a \textbf{hard bias}. That is, a restriction on the hypothesis space that is necessary to successfully learn the target concept.
+\\
+\\
+\textbf{Definition:} Inferring a boolean-valued function from training examples of its input and output is learning a \textbf{target concept}. Note that this idea can be extended to finite classes and regression.
+\\
+\\
+\textbf{The inductive learning hypothesis} is that any hypothesis found to approximate the target function well over a sufficiently large set of training examples will also approximate the target function well over other unobserved examples.
+\\
+\\
+We are able to order hypothesis on the continuum from least specific to most specific. With this ordering, we are also able to define the set of hypothesis bounded by the most and least specific hypotheses.
+\\
+\\
+\textbf{Definition} Let $h_i, h_j$ be hypotheses defined over some set of instances $X$. $h_J$ is \textbf{more general than or equal to} $h_i$ ($h_j \geq_g h_i$)if and only if $$(\forall x \in X)(h_i(x) = 1 \implies h_j(x) = 1)$$. And, in this case, hypothesis $h_i$ is \textbf{more specific than or equal to} $h_j$ (written $h_i \leq_s h_j$).
+\\
+\\
+Moreover, we can define two simple algorithms--Find-S and Find-G--that are able to, respectively, find the most specific and most general hypotheses.
+\\
+FIND-S: (FIND-G with minimal change)*\\
+\text{	} Let $h = $ most specific $h \in H$ \\
+\text{	} for each $x \in X$ such that $c(x) = 1$: \\
+\text{	} \text{	} \text{	} for each attribute $a_i$ in $h$:\\
+\text{	} \text{	} \text{	} \text{	} \text{	} if $a_i$ is satisfied by $x$ then do nothing \\
+\text{	}\text{	}\text{	}\text{	}\text{	} else replace $a_i$ in $h$ with the next more general constraint that is satisfied by $x$
+\\
+\\
+Note, to make this FIND-G, (1) initialize $h$ to be the most general hypothesis in $H$ (2) iterate over $x$ that satisfy $c(x) = 0$ (3) if $a_i$ in $h$ disagrees with $a_i$ in $x$, then change the attribute $a_i$ in $h$ to the next most specific constraint that satisfies $x$.
+\\
+\\
+\textbf{Definition} A hypothesis $h$ is \textbf{consistent} with a set of training examples $D$ if any only if $(\forall [x,c(x)] \in D)(h(x) = c(x))$. That is, $h$ classifies all instances correctly.
+\\
+\\
+\textbf{Definition:} The \textbf{version space} of a hypothesis space $H$ with respect to a set of training examples $D$ (denoted $VS_{H.D}$) is the subset of hypothesis that are consistent with $D$. $$VS_{H,D} = \{ h \in H | Consistent(h,D) \}$$
+\\
+\\
+We have two ways of representing the version space. We can either explicitly or implicitly represent the space. 
+\\
+\\
+\text{	} \text{	} To explicitly represent $VS_{H,D}$, we can \text{list} every $h \ in H$, and \textbf{then}, for each training example, \text{eliminate} all hypothesis that are inconsistent with the example. The remaining hypotheses are precisely the hypotheses in $H$ consistent with $D$, and thus is a complete list of the version space.
+\\
+\\
+\text{	} \text{	} To implicitly represent the version space, we can keep track of the most specific and most general hypothesis in $H$. These two hypotheses, $h_s$ and $h_g$, bound the set of consistent hypothesis, thus delimiting the version space. However, there may be more than one member of $H$ that is maximally general or specific. Thus, we formally define these two boundaries of the version space. The \textbf{candidate elimination} algorithm, which implicitly defines $VS_{H,D}$, is essentially running FIND-S and FIND-G in parallel, while keeping track of the general and specific boundaries (defined below).
+\\
+\\
+\textbf{Definition} The \textbf{general boundary} $G$ of a hypothesis space $H$ and training data $D$ is the set of maximally general members of $H$ consistent with $D$ $$G = \{ g \in H | Consistent(g,D) \wedge (\not \exists h \in H)(h >_g g \wedge Consistent(h,D)) \}$$
+\\
+\\
+\textbf{Definition} The \textbf{specific boundary} $S$ of a hypothesis space $H$ and training data $D$ is the set of maximally specific members of $H$ consistent with $D$ $$S = \{ s \in H | Consistent(s,D) \wedge (\not \exists h \in H)(h >_s s \wedge Consistent(h,D)) \}$$
 \end{question}
+\\
+\\
+It is worthy to note that \textbf{candidate elimination} will converge toward a hypothesis that correctly describes the target concept if there are no errors in the training examples and if there exists a hypothesis in $H$ that correctly describes the target concept. If either of these two conditions are not fulfilled, then candidate elimination will output the empty set as the version space (effectively learning that there is no hypothesis that captures the target concept).
+\\
+\\
+One effective use of using candidate elimination to define a version space is to use the set of hypothesis output by candidate elimination in a voting scheme, where all hypotheses are "asked" to give the classification of an unobserved instance $x$, and the majority decision of all hypotheses is taken as the classification of $x$. Of course, non-equal weightings of hypotheses and different voting schemes may be used to construct a classifier in this manner.
+\\
+\\
+\underline{The Importance of Bias in Learning}\\
+Consider having an unbiased learner $U$. That is, the hypothesis space $H$ for $U$ is the power set of all instances $X$. $H$ has no bias because $H$ includes every possible classification of instances. However, since $H$ has no bias, $U$ will only be able to \textbf{memorize} the classification of instances it observes: $U$ has absolutely no ability to generalize beyond observed training instances. The reason why this is the case is because, after observing any instance $x$, exactly half of the hypotheses in $H$ will agree with the classification of $x$ and the other half will disagree with the classification of $x$.
+\\
+\\
+One can think of unbiased learning as a problem of indecisiveness.
+\\
+\\
+\textbf{Definition}: Let $L$ be a concept learning algorithm with hypothesis space $H$ for the set of instances $X$. Let $D_c = \{ <x,c(x)>\}$ be some set of training examples for concept $c$. $L(x, D_c)$ is the classification of instance $x$ by learner $L$ after training on data $D_c$. The \textbf{inductive bias} of $L$ is any minimal set of assertions $B$ that we assume to be true (to justify our inductive inferences as deductive inferences) such that for any target concept $c$ and corresponding training examples $D_c$ $$(\forall x \in X)[(B \wedge D_c \wedge x) \vdash L(x,D_c)]$$
 
 
 \begin{question}{Information Theory}
@@ -100,10 +177,15 @@ We can ask "How much is B telling us about A" and we get...
 
 ";" means between
 
-$I(A;B) = H(A) - H(A/B)$
-
-
+$I(X;Y) = H(X) - H(X|Y) = H(Y)-H(Y|X) = H(X) + H(Y) - H(X,Y) = H(X,Y) - H(X|Y) - H(Y|X)$
+\\
+$I(X;Y) = \displaystyle\sum\limits_{y \in Range(Y)}{\displaystyle\sum\limits_{x \in Range(X)}{p_{X,Y}(x,y) \log_2 \frac{p_{X,Y}(x,y)}{p_X(x)p_Y(y)}}}$
+\\
+\\
 $I(X;Y;Z) = I(X;Y) - I(X;Y/Z) = H(X,Y,Z) - H(X,Y) - H(X,Z) - H(Y,Z) + H(X) + H(Y) + H(Z)$
+\\
+\\
+Note that $I(X;X) = H(X) - H(X|X) = H(X)$
 
 Can be negative with three variables.
 
@@ -148,7 +230,7 @@ The hypothesis space of all decision trees is a \emph{complete} space of finite 
 functions, relative to the available attributes. 
 
 It only keeps track a single current hypothesis when searching the space of DTs. Cannot keep track 
-of all conistent hypotheses.
+of all consistent hypotheses.
 
 \textbf{Preference bias (soft, rank, search):}
 
@@ -229,7 +311,7 @@ $$SplitInformation(S,A) = - \displaystyle\sum\limits_{v\in values(A)}\frac{|S_v|
 This is the same thing the entropy of $S$ with respect to the values of attribute $A$. We can now use this
 to give a penalty to those attributes that have uniform distributions:
 
-$$GainRation(S,A) \equiv \frac{Gain(S,A)}{SplitInformation(S,A)}$$
+$$GainRatio(S,A) \equiv \frac{Gain(S,A)}{SplitInformation(S,A)}$$
 
 
 \underline{Handling training examples with missing attribute values:}
@@ -265,7 +347,7 @@ low cost attributes.
 
 
 
-\begin{question}{Nueral Nets: }
+\begin{question}{Artificial Neural Networks: }
 
 \textbf{Appropriate for:}
 
@@ -286,7 +368,7 @@ Much is unknown about which classes of functions can be described with which typ
 \begin{itemize}
     \item Boolean function: Every boolean function can be represented with  two layers
     \item Continuous functions: Can be approximated with arbitrary low error with two layers
-    \item Aribtary functions: approximated with arbitrary accuracy with two layers
+    \item Arbitrary functions: approximated with arbitrary accuracy with two layers
 \end{itemize}
 
 In all, we see that networks with small depths provide a very expressive hypothesis space.
@@ -306,7 +388,7 @@ between as positive as well.
 \textbf{Perceptron training rule:}
 
 Proven to converge to a consistent hypothesis given that the training examples are 
-linearly seperable, and a sufficiently small $\eta$ is used.
+linearly separable, and a sufficiently small $\eta$ is used.
 
 Update rule: $w_i \leftarrow w_i + \eta (t-o)x_i$
 
@@ -314,17 +396,17 @@ Update rule: $w_i \leftarrow w_i + \eta (t-o)x_i$
 
 Used when:
 \begin{itemize}
-    \item Hypothesis space contains continuously paramaterized hypotheses
+    \item Hypothesis space contains continuously parameterized hypotheses
     \item The error can be differentiated with respect to the hypothesis parameters
 \end{itemize}
 
 Practical difficulties:
 \begin{itemize}
     \item Can be pretty slow (can take thousands of iterations to converge)
-    \item If there are multiple local minimum then it is not gaurunteed to converge
+    \item If there are multiple local minimum then it is not guaranteed to converge
 \end{itemize}
 
-If training data is not linearly seperable it is proven to converge to best-fit
+If training data is not linearly separable it is proven to converge to best-fit
 approximation.
 
 In general: $\Delta w_i = - \eta \frac{\delta E}{\delta w_i}$
@@ -357,8 +439,10 @@ Difference between Standard and Stochastic
 \textbf{Backpropagation:}
 
 \underline{English approximation of algorithm:}\\
-For each training example apply it to the network. Calculate the error of the network.
-Compute gradient with resepect to the error. Update all the weights. Repeat.
+For each training example apply it to the network:
+\\ \text{	} \text{	} \text{	} Calculate the error, the difference in the label and the output of the network, for each of the output units. Then, backpropagate this error signal through the network, determining the error of each hidden unit (the partial derivative of the error with respect to each weight). Once we have calculated how much error each weight contributes to the total output, we will have our gradient: a vector of partial derivatives of the error with respect to each weight. We adjust all of the weights such that we "move" in the direction that minimizes the entire error of the network.
+\\
+Iterate this process until convergence (or until the error is acceptable).
 
 \underline{Caveats:}\\
 BP can have multiple local minimum. 
@@ -398,7 +482,7 @@ What's it do?
 
 \underline{Convergence and god damn local minima:}
 
-BP is not gaurunteed to converge to local minima.
+BP is not guaranteed to converge to local minima.
 
 For high dimensional networks what may be a local min for one weight is probably not a local
 min with respect to another weight. So as there are more weights, there are more "escape" routes
@@ -460,7 +544,7 @@ $$E(w) \equiv \frac{1}{2} \displaystyle\sum\limits_{d} \displaystyle\sum\limits_
 How many iterations should the algorithm perform? It should be enough to produce the lowest error over
 the validation set. This can be done by \textbf{cross validation}: keeping two copies of the network. One which has the weights of
 the best on the validation set so far. The other copy is the current training copy. Once the error
-on the training copy is siginficantly lower than the validation set we can terminate the algorithm
+on the training copy is significantly lower than the validation set we can terminate the algorithm
 and output the best network so far with respect to the validation set.
 
 But what about small data sets where we cannot split the data up into training and validation sets? We can
@@ -479,7 +563,7 @@ this is done by multiple line searches and I don't know.
 \underline{Recurrent networks:}
 If we would like the network at time t to depend on time t-1 we can add a hidden unit (b) and a input unit (c). Unit b
 takes all the inputs, including unit c as inputs. It's output is then c at time t+1. This allows b to summarize earlier
-values of the inputs that are abritarily far away in time. You can add several layers between the inputs and b. You could
+values of the inputs that are arbitrarily far away in time. You can add several layers between the inputs and b. You could
 also add several more b and c units in parallel.
 
 How do we train? You can "unfold" the network and use BP directly. There are also better ways without unfolding that are
@@ -550,6 +634,16 @@ Assume that for some concept class $C$, $VC(C) \geq 2$, and that we have a learn
 \\
 \\
 \\
-The \textbf{VC-Dimension for directed acyclic layered networks} of perceptrons, $N_P$, is $VC(N_P) \leq 2(r+1)s \log_2(es)$, where $s$ is the number of internal nodes (including all output nodes), $r$ is the maximum input into any single perceptron, and $e$ is Euler's number.
+The \textbf{VC-Dimension for directed acyclic layered networks} of perceptrons, $N_P$, is $$VC(N_P) \leq 2(r+1)s \log_2(es)$$, where $s$ is the number of internal nodes (including all output nodes), $r$ is the maximum input into any single perceptron, and $e$ is Euler's number.
+\\
+\\
+\underline{Weighted-Majority algorithm and Mistake Bounds} \\
+The weighted majority learning algorithm makes predictions by taking a weighted vote among a pool of prediction algorithms and outputs the most popular vote. The algorithms learns by altering the weight associated with each prediction algorithm. Whenever a prediction algorithm misclassifies a new training example, its weight is decreased by multiplying it by some real $\beta$, where $0 \leq \beta < 1$. Note if $\beta = 0$ then weighted majority is equivalent to the halving algorithm.
+\\
+\\
+The \textbf{relative upper-mistake-bound for Weighted Majority} is $$2.4(k + \log_2 n)$$ where $k$ is the minimum number of mistakes made by algorithm $A$, which contains $n$ prediction algorithms, when training on a sequence of instances $D$. In addition, it is assumed that $\beta = \frac{1}{2}$ .
+\\
+\\
+For an arbitrary $\beta$, the upper bound on the number of mistakes necessary to learn some target concept $c$ using a weighted majority algorithm with $n$ prediction algorithms is $$\frac{k \log_2 \frac{1}{\beta} + \log_2 n}{\log_2 \frac{2}{1+\beta}}$$
 \end{question}
 \end{document}

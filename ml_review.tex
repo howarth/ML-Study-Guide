@@ -848,7 +848,7 @@ Computation is $O(N^2T)$
     $P(O|\lambda) = \beta_0(S_0) = \alpha_T(S_N)$ 
 
 \textbf{Viterbi Algorithm}\\
-    Find state sequence $Q$ wich maximizes $P(O, Q|\lambda)$
+    Find state sequence $Q$ which maximizes $P(O, Q|\lambda)$
 
     $VP_t(i) = MAX_{q_0,..q_{t-1}} P(O_1O_2 ... O_t, q_t = i | \lambda)$\\
     $VP_t(j) = MAX_{i=0, ... N} VP_{t-1}(i) a_{ij}b_j(O_t)$
@@ -1068,11 +1068,11 @@ Bagging  = \textbf{B}ootstrap \textbf{agg}regat\textbf{ing}
 The general procedure of bagging is to first take the training data and divide it
 into a training set and test set, and repeat this process some N times. We then train
 a learner on all sets. The learner could be the same for all sets, or they can be different.
-When trying to find the mapping for a new example, we run the example agaisnt all
+When trying to find the mapping for a new example, we run the example against all
 N learners, and take a (weighted) majority vote.
 
 TO TALK BOUT: Variance of error
-With bagging the expected error for the aggredated hypothesis is lower
+With bagging the expected error for the aggregated hypothesis is lower
 than the expected value for an individual hypothesis.
 
 

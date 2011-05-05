@@ -48,8 +48,25 @@
 .
 \\
 \\
-Created by Dan Howarth and Malcolm Greaves. Adapted significantly from "Machine Learning" by Tom M. Mitchell (1997).
-
+Created by Dan Howarth and Malcolm Greaves. Adapted significantly from ``Machine Learning'' by Tom M. Mitchell (1997).
+\\
+\\
+Table of Contents:
+\begin{itemize}
+	\item Overview of Learning
+	\item Concept Learning
+	\item Information Theory
+	\item Decision Trees
+	\item Artificial Neural Networks
+	\item Computational Learning Theory
+	\item Evaluating and Comparing Hypotheses
+	\item Bayesian Statistics
+	\item Naive Bayes Classifier and Bayes Networks
+	\item Hidden Markov Models
+	\item Instance Based Learning
+	\item Reinforcement Learning
+	\item Genetic Algorithms
+\end{itemize}
 \begin{question}{Overview of learning}
 \textbf{Definition} A computer program is said to \textbf{learn} from experience $E$, with respect to some class of tasks $T$ and performance measure $P$, if the program's performance at tasks in $T$, as measured by $P$, improves with experience $E$. (Mitchell, p2)
 \\
@@ -124,7 +141,7 @@ We have two ways of representing the version space. We can either explicitly or 
 It is worthy to note that \textbf{candidate elimination} will converge toward a hypothesis that correctly describes the target concept if there are no errors in the training examples and if there exists a hypothesis in $H$ that correctly describes the target concept. If either of these two conditions are not fulfilled, then candidate elimination will output the empty set as the version space (effectively learning that there is no hypothesis that captures the target concept).
 \\
 \\
-One effective use of using candidate elimination to define a version space is to use the set of hypothesis output by candidate elimination in a voting scheme, where all hypotheses are "asked" to give the classification of an unobserved instance $x$, and the majority decision of all hypotheses is taken as the classification of $x$. Of course, non-equal weightings of hypotheses and different voting schemes may be used to construct a classifier in this manner.
+One effective use of using candidate elimination to define a version space is to use the set of hypothesis output by candidate elimination in a voting scheme, where all hypotheses are ``asked'' to give the classification of an unobserved instance $x$, and the majority decision of all hypotheses is taken as the classification of $x$. Of course, non-equal weightings of hypotheses and different voting schemes may be used to construct a classifier in this manner.
 \\
 \\
 \underline{The Importance of Bias in Learning}\\
@@ -171,11 +188,11 @@ $H(A,B) < H(A) + H(B)$ TODO: Is this only when dependent?
 
 $H(A/B) = \displaystyle\sum\limits_{b}P(B=b)H(A|B=b)$
 
-We can ask "How much is B telling us about A" and we get...
+We can ask ``How much is B telling us about A'' and we get...
 
 \underline{Mutual Information}
 
-";" means between
+``'';'' means between
 
 $I(X;Y) = H(X) - H(X|Y) = H(Y)-H(Y|X) = H(X) + H(Y) - H(X,Y) = H(X,Y) - H(X|Y) - H(Y|X)$
 \\
@@ -210,7 +227,7 @@ Appropriate for:
     \item The training data may contain errors
     \item The training data may contain missing attribute values
     \item Train attributes with different costs
-    \item When you do not want to risk "throwing the baby out of the water"
+    \item When you do not want to risk ``throwing the baby out of the water''
 \end{itemize}
 
 \underline{Limitations:}
@@ -265,7 +282,7 @@ The latter has been found to perform better in practice.
 
 Ways to determine the correct final tree size: (1) Use a separate set of examples, distinct from the training
 examples, to evaluate the utility of post-pruning nodes from the tree. (2) Use all the available data for training,
-but apply statistical analasys to estimate whether exapnding (or pruning) a particular node is likely
+but apply statistical analysis to estimate whether expanding (or pruning) a particular node is likely
 to produce a better hypothesis
 
 \underline{Reduced error pruning:}
@@ -288,7 +305,7 @@ whose removal improves accuracy. After this is done for each rule, sort the rule
 
 The advantages:
 \begin{itemize}
-    \item Can consider to prune a sinle rule instead of a subtree.
+    \item Can consider to prune a rule instead of a subtree.
     \item In decision trees when we consider removing nodes near the root it requires messy bookkeeping issues
     such as how to restructure the tree after removing the node while also retaining the structure of the 
     subtree below this test.
@@ -296,7 +313,7 @@ The advantages:
 \end{itemize}
 
 We can incorporate \textbf{continuous valued functions} be creating classifications such as whether or not
-the number is below or above a certain number. These number too are choosed from their information gain.
+the number is below or above a certain number. These number are also chosen for their information gain.
 
 \underline{Alternative measure for selecting attributes:}
 There is a natural bias in the information gain measure that favors attributes with many values over
@@ -440,7 +457,7 @@ Difference between Standard and Stochastic
 
 \underline{English approximation of algorithm:}\\
 For each training example apply it to the network:
-\\ \text{	} \text{	} \text{	} Calculate the error, the difference in the label and the output of the network, for each of the output units. Then, backpropagate this error signal through the network, determining the error of each hidden unit (the partial derivative of the error with respect to each weight). Once we have calculated how much error each weight contributes to the total output, we will have our gradient: a vector of partial derivatives of the error with respect to each weight. We adjust all of the weights such that we "move" in the direction that minimizes the entire error of the network.
+\\ \text{	} \text{	} \text{	} Calculate the error, the difference in the label and the output of the network, for each of the output units. Then, backpropagate this error signal through the network, determining the error of each hidden unit (the partial derivative of the error with respect to each weight). Once we have calculated how much error each weight contributes to the total output, we will have our gradient: a vector of partial derivatives of the error with respect to each weight. We adjust all of the weights such that we ``move'' in the direction that minimizes the entire error of the network.
 \\
 Iterate this process until convergence (or until the error is acceptable).
 
@@ -485,7 +502,7 @@ What's it do?
 BP is not guaranteed to converge to local minima.
 
 For high dimensional networks what may be a local min for one weight is probably not a local
-min with respect to another weight. So as there are more weights, there are more "escape" routes
+min with respect to another weight. So as there are more weights, there are more ``escape'' routes
 in which we can get out of local minimum. 
 
 When the weights are initialized they are close to zero. At these points the sigmoid function
@@ -566,7 +583,7 @@ takes all the inputs, including unit c as inputs. It's output is then c at time 
 values of the inputs that are arbitrarily far away in time. You can add several layers between the inputs and b. You could
 also add several more b and c units in parallel.
 
-How do we train? You can "unfold" the network and use BP directly. There are also better ways without unfolding that are
+How do we train? You can ``unfold'' the network and use BP directly. There are also better ways without unfolding that are
 not included in the book.
 
 \underline{Dynamically Modifying Network Structure:}
@@ -581,7 +598,7 @@ Removing units:
 
 
 \begin{question}{Computational Learning Theory:}
-How can we characterize machine learning algorithms? What paradigms can we define in order to answer questions such as, "how many training examples do we need in order to successfully learn a target concept?" And, "what do we define as successful learning?" The fundamental purpose of computational learning theory is to provide frameworks for answering such meta-questions about machine learning algorithms. We will focus on two such frameworks: the probably approximately correct (PAC) learning framework and the mistake bounds framework.
+How can we characterize machine learning algorithms? What paradigms can we define in order to answer questions such as, ``how many training examples do we need in order to successfully learn a target concept?'' And, ``what do we define as successful learning?'' The fundamental purpose of computational learning theory is to provide frameworks for answering such meta-questions about machine learning algorithms. We will focus on two such frameworks: the probably approximately correct (PAC) learning framework and the mistake bounds framework.
 \\
 We are primarily concerned with characterizing learning algorithms in these two dimensions: (1) sample complexity and (2) computational complexity. Sample complexity refers to the number of training examples needed to successfully learn a target concept. Computational complexity refers to the amount of computational power required to successfully learn a target concept. Note that both of these dimensions must be polynomial.
 \\
@@ -627,7 +644,7 @@ In the case where $|H| = \infty$, we must define a new measure of the expressivi
 \textbf{Definition:} The \textbf{Vapnik-Chervonenkis dimension}, $VC(H)$, of a hypothesis space $H$ defined over a space of instances $X$ is the size of the largest finite subset of $X$ that is shattered by $H$. If an arbitrarily large finite set of $X$ can be shattered by $H$, then $VC(H) = \infty$. Note that for any finite hypothesis space, $VC(H) \leq \log_2 |H|$ since there must be at least $2^d$ distinct hypothesis in $H$ if $VC(H) = d$. 
 \\
 \\
-As described in "Machine Learning" by Mitchell (p217), the minimum number of training examples $m$ required to sufficiently learn a target concept $C$ is $$m \geq \frac{1}{\epsilon}(4 \log_2 \frac{2}{\delta} + 8 VC(H) \log_2(\frac{13}{\epsilon}))$$
+As described in ``Machine Learning'' by Mitchell (p217), the minimum number of training examples $m$ required to sufficiently learn a target concept $C$ is $$m \geq \frac{1}{\epsilon}(4 \log_2 \frac{2}{\delta} + 8 VC(H) \log_2(\frac{13}{\epsilon}))$$
 \\
 \\
 Assume that for some concept class $C$, $VC(C) \geq 2$, and that we have a learner $L$, where $0 < \epsilon < \frac{1}{8}$ and $0 < \delta < \frac{1}{100}$. Then, $\exists $ distribution $D^*$ and target concept $c \ in C$ such that if $L$ observes fewer than $max [\frac{1}{\epsilon} \log_2 \frac{1}{\delta}, \frac{VC(C) - 1}{32\epsilon}]$ training examples then $L$ will output a hypothesis $h$ having $error_{D^*}(h) > \epsilon$ with probability at least $\delta$.
@@ -645,5 +662,69 @@ The \textbf{relative upper-mistake-bound for Weighted Majority} is $$2.4(k + \lo
 \\
 \\
 For an arbitrary $\beta$, the upper bound on the number of mistakes necessary to learn some target concept $c$ using a weighted majority algorithm with $n$ prediction algorithms is $$\frac{k \log_2 \frac{1}{\beta} + \log_2 n}{\log_2 \frac{2}{1+\beta}}$$
+\end{question}
+
+\begin{question}{Evaluating and Comparing Hypotheses}
+	When evaluating a hypothesis, we are interested in answering these three questions:
+	\begin{itemize}
+		\item Given the observed accuracy of a hypothesis over a limited sample of data, how well does this accuracy generalize over future, unobserved data?
+		\item Given that one hypothesis outperforms another over some set of data, how probable is it that this hypothesis is more accurate in general?
+		\item What is the best way to use limited data to both learn a hypothesis and estimate its accuracy? When we attempt to do this, we must be observant of the hypothesis' bias (potential overfit) of the limited data and the variance inherit in the hypothesis' estimate.
+	\end{itemize}
+	The \textbf{sample error} of a hypothesis $h$ with respect to a target function $f$ and data sample $S$ is $$error_s(h) = \frac{1}{n}\sum_{x \in S}{\delta(f(x), h(x))}$$ where $|S| = n$ and $\delta(f(x), h(x))$ is one iff $f(x) \not = h(x)$ and zero otherwise (it's an indicator function for error in the hypothesis).
+	\\
+	\\
+	The \textbf{true error} of a hypothesis $h$ respect to a target function $f$ and true data distribution $\mathcal{D}$ is exactly the probability that $h$ will misclassify an instance drawn at random according to the distribution $\mathcal{D}$, denoted $P_{x \in \mathcal{D}}$ $$error_{\mathcal{D}} = P_{x \in \mathcal{D}}(f(x) \not = h(x))$$
+	\\
+	\\
+	We use confidence intervals to quantify the extent that our sample error estimates the true error of a hypothesis. In order to use a confidence interval, we must have the following three conditions:
+	\begin{itemize}
+		\item The sample $S$ contains $n$ examples drawn independent of one another, and independent of $h$, according to the probability distribution $\mathcal{D}$.
+		\item We must have at least 30 examples $(n \geq 30)$.
+		\item Hypothesis $h$ commits $r$ errors over the $n$ examples.
+	\end{itemize}
+	
+	With these and only these three conditions, statistical theory states that the most probable value of the true error of the hypothesis is the sample error of the hypothesis. In addition, with $N\%$ probability, the true error lies in the interval $$error_S(h) \pm z_N \sqrt{\frac{error_S(h)(1-error_S(h))}{n}}$$
+	
+	Note that this \textbf{two-sided confidence interval} that bounds the true error of the hypothesis $h$ (with a given probability) assumes that the sample is drawn at random according to the true probability distribution and that the data is independent of the hypothesis being tested.
+	\\
+	\\
+	A \textbf{one-sided confidence interval} is used to bound the true error of a hypothesis from either above or below. In the first case, we give a probability that the true error is less than or equal to a certain bound and in the latter case we give a probability that the true error is greater than or equal to a boundary. Using a one-sided confidence interval is useful for answering the a question such as, ``what is the probability that hypothesis $h$ has error less than U?''
+	\\
+	For Normally distributed random variables, there is a very easy way to calculate a one-sided confidence interval. Since the Normal distribution is symmetric about its mean, any two-sided confidence interval can be converted to a corresponding one-sided interval with twice the confidence. Thus, a $100(1-\alpha)\%$ two-sided confidence interval ($L$,$U$) implies a $100(1-\alpha/2)\%$ confidence interval with either a lower bound $L$ or an upper bound $U$ (note that $\alpha$ is the probability that the correct value lies outside the stated interval).
+	\\
+	\\
+	Often, we are interested in the \textbf{difference in error between two hypotheses}. We define this true difference as $$d = error_{\mathcal{D}}(h_1) - error_{\mathcal{D}}(h_2)$$. We estimate this difference with sample error as $$\hat d = error_S(h_1) - error_S(h_2)$$. Note that $\hat d$ gives an unbiased estimate of $d$ ($E[\hat d] = d$), assuming that the samples were drawn using the same method (bias).
+	\\
+	If the error is Normally distributed, which it often is, then we see that the difference of two Normally distributed random variables is also Normally distributed. Thus, we can apply all of our previous knowledge about one and two sided confidence intervals to the difference in the error of two hypotheses. Thus, we can express confidence intervals on $\hat d$ or $d$
+	$$\hat d \pm z_N \sqrt{\frac{error_{S_1}(h_1)(1-error_{S_1}(h_1))}{n_1} + \frac{error_{S_2}(h_2)(1-error_{S_2}(h_2))}{n_2}}$$
+	Where the variance is
+	$$\sigma_{\hat d}^2 = error_{S_1}(h_1)(1-error_{S_1}(h_1))}{n_1} + \frac{error_{S_2}(h_2)(1-error_{S_2}(h_2))}{n_2}$$
+	This is for a two-sided confidence interval. It follows that we can make an appropriate one-sided confidence interval as well.
+	\\
+	\\
+	Sometimes, we are interested in the probability that some conjecture is true, such as ``the true error of hypothesis one is less than the true error of hypothesis two.'' This is known as \textbf{hypothesis testing}. 
+	
+	\textbf{Common Distributions}:
+	\begin{itemize}
+		\item The \textbf{binomial distribution} characterizes the probability of observing $r$ heads in a series of $n$ independent coin tosses where the probability of heads in each toss is $p$ (note that $r, p, n$ are the parameters of a binomial distribution).
+		For any value of $r \in [n] \cup \emptyset$, the binomial distribution dictates $$P(r) = \frac{n!}{r!(n-r)!}p^r(1-p)^{n-r}$$
+		The mean is $np$ and the variance is $np(1-p)$, with standard deviation $\sqrt{np(1-p)}$. It is worthy to note that, for very large values of $n$, the binomial distribution is closely approximated by a Normal distribution. 
+		\item The \textbf{normal distribution} is a bell-shaped distribution that is defined by the probability density function (pdf) $$p_n(x) = \frac{1}{\sqrt{2 \pi \sigma^2}}^{e^{-\frac{1}{2}(\frac{x-\mu}{\sigma})^2}}$$ Note that the mean $\mu$ and standard deviation $\sigma$ are the only two parameters of a normal distribution.
+		\\The probability of any interval $[a,b]$ in the Normal distribution is $\int_{a}^{b}{p_n(x)\textit{d}x}$
+		\\The mean of the Normal distribution is $\mu$
+		\\The variance of the Normal distribution is $\sigma^2$. The standard deviation is $\sigma$
+		\\The \textbf{Central Limit Theorem} states that the sum of a large number of independent, identically distributed random variables follows a distribution that is approximately Normal.
+	\end{itemize}
+	
+	\textbf{Statistical Terms} See Mitchell p133 for a more comprehensive list.
+	\begin{itemize}
+		\item An \textbf{estimator} is a random variable $Y$ that is used to estimate some parameter $p$ of an underlying population.
+		\item The \textbf{estimation bias} of $Y$ as an estimator for $p$ is the quantity $(E[Y] - p)$. An unbiased estimator as a zero estimation bias.
+		\item An $N\%$ \textbf{confidence interval} for parameter $p$ is an interval that includes $p$ with probability $N\%$.
+		\item The \textbf{expected value, or mean} of a random variable $Y$ is $E[Y] = \sum_{i}{y_i * P(Y = y_i)} = \mu_Y$
+		\item The \textbf{variance} of a random variable $Y$ is $Var(Y) = E[(Y - \mu_Y)^2]$. The variance characterizes the width of the distribution about its mean.
+		\item The \textbf{standard deviation} of a random variable $Y$ is defined as the square root of the variance of $Y$. 
+	\end{itemize}
 \end{question}
 \end{document}

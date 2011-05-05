@@ -787,6 +787,41 @@ For an arbitrary $\beta$, the upper bound on the number of mistakes necessary to
 
 \begin{question}{Bayes Networks and Expectation Maximization}
 	
+
+
+\textbf{The EM Algorithm}
+
+The EM algorithm can be applied in manny settings where we 
+wish to estimate some set of parameters $\Theta$
+that describe an underlying probability distribution, given only the observed portion of
+the fill data produced by this distribution.
+
+The observables are of the form $X = \{x_1, ... x_m\}$ and the unobserved data are
+in the form $Z = \{z_1, ... z_m\}$. We denote the full data as $Y = X \cup Z$
+
+In general we do not know the underlying distribution of
+$\Theta$, since it is what we are trying to estimate. To overcome
+this the EM algorithm uses the current hypothesis as the model to estimate
+the distribution governing Y.
+
+We define the function $Q(h'|h)$ that gives $E[ln P(Y|h')]$ as a function
+oh $h'$, under the assumption that $\Theta = h$
+$$Q(h'|h) = E[\ln p(Y|h')|h, X]$$
+
+We then repeat the following steps till convergence:
+
+\textbf{Step 1:} \emph{Estimation Step}: Calculate $Q(h'|h)$ using the current hypothesis
+    $h$ and the observed data X to estimate the probability distribution over $Y$
+    $$Q(h'|h) \leftarrow E[\ln p(Y|h') | h, X]$$
+ 
+\textbf{Step 2:} \emph{Maximization step}: Replace hypothesis $h$ by the hypothesis $h'$
+that maximizes this Q function.
+$$h \leftarrow \arg\max_{h'} Q(h'|h)$$
+
+When Q is continuous the EM algorithm converges to a stationary
+point of the likelihood function $P(Y|h')$. It follows the normal
+problems that occur when you have multiple optima.
+
 \end{question}
 
 
@@ -922,8 +957,8 @@ This can be done by learning a weight for each dimension. It may also be benific
 to completely remove some attributes.
 
 
-\textbf{Kernal function:} function of distance that is used to determine the weight of each training example.
-In other words, the kernal function is the function K such that $$w_i = K(d(x_i, x_q))$$
+\textbf{Kernel function:} function of distance that is used to determine the weight of each training example.
+In other words, the kernel function is the function K such that $$w_i = K(d(x_i, x_q))$$
 
 \textbf{Locally weight regression}
 
@@ -931,8 +966,8 @@ We can combine KNN and regression by:
 
 \begin{itemize}
     \item Minimize squared error on the K nearest neighbors \\
-    \item Minimize squared error on all examples, but use some kernal function to weight examples. \\
-    \item Combine both, weight K nearest neighbors with a kernal function \\
+    \item Minimize squared error on all examples, but use some kernel function to weight examples. \\
+    \item Combine both, weight K nearest neighbors with a kernel function \\
 \end{itemize}
 
 In most cases the functon is approximated by a constant, linear, or quadratic function.
@@ -940,19 +975,19 @@ This is because the cost of approximating a more complex function for each insta
 is too high, and simple approximations normally do a good job for a sufficiently
 small subregion.
 
-\textbf{Gaussian Kernal:}
+\textbf{Gaussian Kernel:}
 $$K(x_a, x_b) \equiv e^{\frac{-D(x_a - x_b)}{2\sigma^2}}$$
 We can apply a gaussian to R data points, add these gaussians
 together, the divide this gaussian by n and we get a pdf for
 predicting y given x\\
-By changing $\sigma$ on the gaussians we can get kernal smoothing.
+By changing $\sigma$ on the gaussians we can get kernel smoothing.
 
 
 \textbf{Radial Basis Functions}
 
 RBF netowrks are a type of ANN constructed from spatially localized
-kernal function. These can be seen as a blend of instance-based
-approaches (spatially localized influence of each kernal function) and
+kernel function. These can be seen as a blend of instance-based
+approaches (spatially localized influence of each kernel function) and
 neural network approaches (a global approximation to the
 target function is formed at training time rather than a local
 approximation
@@ -975,29 +1010,28 @@ small approximations.
 \end{question}
 
 \begin{question}{Genetic Algorithms}
-Good things about GA:
-\begin{itemize}
-    \item Evolution is know to be successful\\
-    \item GAs can search spaces of hypothesis containing complex interacting
-    parts, where the impact of each part on overall hypothesis fitness may be difficult
-    to model \\
-    \item GA are easily parallelized\\
-\end{itemize}
-Elements of a GA:
-\begin{itemize}
-    \item \textbf{Representation}: A way to represent a hypothesis (normally a bitstring)\\
-    \item \textbf{Population}: a collection of hypothesis \\
-    \item \textbf{Fitness function}: A function that evaluates the quality of a hypothesis\\
-    \item \textbf{Crossover operation}: Given two parents, a crossover operation creates
+\textbf{Good things about GA:}\\
+Evolution is know to be successful\\
+GAs can search spaces of hypothesis containing complex interacting
+parts, where the impact of each part on overall hypothesis fitness may be difficult
+to model \\
+GA are easily parallelized\\
+
+Elements of a GA:\\
+    \textbf{Representation}: A way to represent a hypothesis (normally a bitstring)\\
+    \textbf{Population}: a collection of hypothesis \\
+    \textbf{Fitness function}: A function that evaluates the quality of a hypothesis\\
+    \textbf{Crossover operation}: Given two parents, a crossover operation creates
                         two children. The crossover operation should only produce
                         valid children\\
-    \item \textbf{Mutation}: The way in which hypothesis can mutate, and the rate at which
+    \textbf{Mutation}: The way in which hypothesis can mutate, and the rate at which
                             mutate.\\
-    \item \textbf{Rate of replacement}: A rate that determines how much of the population
+    \textbf{Rate of replacement}: A rate that determines how much of the population
                             will be removed at each generation.
-\end{itemize}
 
-TODO: Soft/Hard bias of GA
+The representation is the hard bias
+
+The initial population is the soft bias
 \end{question}
 
 \begin{question}{Reinforcement Learning}
@@ -1056,7 +1090,6 @@ a learner on all sets. The learner could be the same for all sets, or they can b
 When trying to find the mapping for a new example, we run the example agaisnt all
 N learners, and take a (weighted) majority vote.
 
-TO TALK BOUT: Variance of error
 With bagging the expected error for the aggredated hypothesis is lower
 than the expected value for an individual hypothesis.
 
@@ -1071,8 +1104,20 @@ example has a significant role in determining the hypothesis.
 Experimentally, bagging can help significantly for unstable learners, but can hurt
 stable learners (such as KNN).
 
-Boosting
+\textbf{Boosting}\\
+-Learn a sequence of classifiers from a single training set.\\
+-But reweighting examples to emphasize misclassified\\
+-Final classifier = weighted combination of classifiers
 \end{question}
 
+The idea of boosting is to take multiple weak hypothesis and use a
+weighted combination of them to form a new hypothesis. This is done incrementally.
+We first start off with one hypothesis based from the data. For every 
+instance it incorrectly classifies, we give those instances a higher weight,
+and retrain. A new hypothesis. Each weak hypothesis is given a weight
+
+It can be shown that if every weak hypothesis has accuracy more than $.5 + \gamma$,
+   $\gamma > 0$, boosting can increase the performance of the weighted combination
+   hypothesis infinitely.
 
 \end{document}

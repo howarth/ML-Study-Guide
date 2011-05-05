@@ -699,7 +699,7 @@ For an arbitrary $\beta$, the upper bound on the number of mistakes necessary to
 	If the error is Normally distributed, which it often is, then we see that the difference of two Normally distributed random variables is also Normally distributed. Thus, we can apply all of our previous knowledge about one and two sided confidence intervals to the difference in the error of two hypotheses. Thus, we can express confidence intervals on $\hat d$ or $d$
 	$$\hat d \pm z_N \sqrt{\frac{error_{S_1}(h_1)(1-error_{S_1}(h_1))}{n_1} + \frac{error_{S_2}(h_2)(1-error_{S_2}(h_2))}{n_2}}$$
 	Where the variance is
-	$$\sigma_{\hat d}^2 = error_{S_1}(h_1)(1-error_{S_1}(h_1))}{n_1} + \frac{error_{S_2}(h_2)(1-error_{S_2}(h_2))}{n_2}$$
+	$$\sigma_{\hat d}^2 = \frac{error_{S_1}(h_1)(1-error_{S_1}(h_1))}{n_1} + \frac{error_{S_2}(h_2)(1-error_{S_2}(h_2))}{n_2}$$
 	This is for a two-sided confidence interval. It follows that we can make an appropriate one-sided confidence interval as well.
 	\\
 	\\
@@ -727,4 +727,263 @@ For an arbitrary $\beta$, the upper bound on the number of mistakes necessary to
 		\item The \textbf{standard deviation} of a random variable $Y$ is defined as the square root of the variance of $Y$. 
 	\end{itemize}
 \end{question}
+=======
+
+
+
+\begin{question}{Hidden Markov Models}
+
+Elements of the model:
+
+States: $S = \{ s_0, s_1,.. s_m \}$\\
+Transition probabilites: $P(q_t = s_i | q_{t-1} = s_j) = a_{ji}$\\
+Output probability distribution: $P(y_t = O_k | q_t = s_j) = b_{j}^(k)$
+
+\textbf{HMM Problems and Solutions:}
+
+\underline{Evaluation:}\\
+We want to compute the probability of observation sequence given a model. We use the
+\emph{forward algorithms} and \emph{Viterbi algorithm}
+
+\underline{Decoding:}\\
+We want to find the state sequence that is most probable given the observation sequence.
+We use the \emph{Viterbi algorithm} to do this.
+
+\underline{Training:}\\
+We want to find the model params (transition probabilities and emission probabilities)
+to maximize the probability of the observed sequences. The solution
+is the \emph{Forward-Backward Algorithm}
+
+\textbf{Forward Algorithm}\\
+$\alpha_t(j) = P(O_1 O_2 ... O_t, q_t = s_j | \lambda)$
+
+$\alpha_0(j) = \text{ 1 if j start state, 0 otherwise}$\\
+$\alpha_t(j) = \bigg{[}\sum^N\alpha_{t-1}(i)a_{ij}\bigg{]}b_j(O_t)$
+
+$P(O|\lambda) = \alpha_T(S_N)$\\
+Computation is $O(N^2T)$
+
+\textbf{Backward Algorithm}\\
+    $\beta_t(i) = P(O_{t+1}O_{t+2}..O_T | q_t = s_i, \lambda)$
+
+    $\beta_T(i) = \text{ 1 if i is end state 0 otherwise}$\\
+    $\beta_t(i) = \sum_j^N a_{ij}b_j(O_{t+1})\beta_{t+1}(j)$\\
+
+    $P(O|\lambda) = \beta_0(S_0) = \alpha_T(S_N)$ 
+
+\textbf{Viterbi Algorithm}\\
+    Find state sequence $Q$ wich maximizes $P(O, Q|\lambda)$
+
+    $VP_t(i) = MAX_{q_0,..q_{t-1}} P(O_1O_2 ... O_t, q_t = i | \lambda)$\\
+    $VP_t(j) = MAX_{i=0, ... N} VP_{t-1}(i) a_{ij}b_j(O_t)$
+
+    $P(O, Q | \lambda) = VP_T(s_N)$
+
+\textbf{Training HMM parameters}\\
+Tune $\lambda$ to maximize $P(O|\lambda)$\\
+No efficient algorithm for global optimum\\
+Efficient iterative algorithm finds local optimum\\
+The \emph{Baum-welch (forward-backward) re-estimation} Computes the probabilities
+for $\lambda$, then refines the estimation based on computed values from forward backward
+algorithm.
+
+\textbf{Forward-Backward Algorithm}\\
+$\xi(i,j) = $ the probability of transiting from $s_i$ to $s_j$ at time t given O\\
+$\xi(i,j) = P(q_t = s_i, q_{t+1} = s_j| O, \lambda) = \frac{\alpha_t(i)a_{ij}b_j(O_{t+1})\beta_{t+1}(j)}{P(O|\lambda)}$ 
+
+\textbf{Baum-Welch Reestimation}\\
+$\hat{a}_{ij} = \frac{ \text{expected number of trans from $s_i$ to $s_j$}}{\text{expected number of trans from $s_i$}}
+= \frac{\sum_{t=0}^{T-1} \xi_t(i,j)}{ \sum_{t=0}^{T-1}\sum_{j=0}^{N} \xi_t(i,j)}$
+
+$\hat{b}_j(k) = \frac{\text{expected number of times in state j with symbol k}}{\text{expected number of times in state j}}
+= \frac{\sum_{t:O_t=k} \sum_{i=0}^N \xi_t(i,j) }{\sum_{t=0}^{T-1}\sum_{i=0}^{N} \xi_t(i,j)}$
+
+We know that $P(O| \lambda^{c+1}) \ge P(O|\lambda^{c})$
+
+
+
+\end{question}
+
+
+
+
+
+\begin{question}{Instance-Based Learning}
+
+What sets local methods apart from what we've learned:
+
+\begin{itemize}
+    \item Generalizing is done at query time\\
+    \item Each distinct query can produce a different approximation to the target function\\
+    \item Advantageous when function as a whole is too complex to model, but by confining
+            the generalization to local instances can produce a satisfactory result. The
+            model as a whole then becomes a collection of local approximations.
+\end{itemize}
+
+\textbf{KNN}
+
+Given a query look at k nearest training examples, and take a majority vote to classify the query.
+
+This can be changed to approximate real valued functions by taking an average value of
+the K nearest neighbors.
+
+\underline{Distance weighted KNN}
+
+Similair to KNN, but add a weight factor to each vote that is inversely proportional
+to distance. For example:
+
+$$w_i \equiv \frac{1}{d(x_q, x_i)^2}$$
+
+$$ \hat{f}(x_q) \leftarrow \frac{\sum^kw_if(x_i)}{\sum^k{w_i}}$$
+
+The normalization of the above function ensures that if all neighbors
+have value $c$, then the new classification will be $c$ as well.
+
+\underline{Remarks on KNN}
+
+\textbf{Induction bias:} We assume that the classification of a query point
+is most likely to be the classification of instances close in
+Eucledian distance.
+
+Given a large enough training set it is robust to noisy training data.
+This is because a few incorrect votes here an there will not have
+a significant effect on classfication.
+
+A practical issue of KNN is that we need to calculate distance based on
+all attributes of distance.
+
+\textbf{Curse of Dimensionality:} Each attribute is represented in a dimension. If there
+are many irrelevant (or even if there are a few) attributes then it can possibly
+skew our distance measure. It is possible that two points may be close when 
+considering irrelevent attributes, but much farther when only considering
+relevent attributes. To fix this we can shorten the axis of irrelevant dimensions.
+This can be done by learning a weight for each dimension. It may also be benificial
+to completely remove some attributes.
+
+
+\textbf{Kernal function:} function of distance that is used to determine the weight of each training example.
+In other words, the kernal function is the function K such that $$w_i = K(d(x_i, x_q))$$
+
+\textbf{Locally weight regression}
+
+We can combine KNN and regression by:
+
+\begin{itemize}
+    \item Minimize squared error on the K nearest neighbors \\
+    \item Minimize squared error on all examples, but use some kernal function to weight examples. \\
+    \item Combine both, weight K nearest neighbors with a kernal function \\
+\end{itemize}
+
+In most cases the functon is approximated by a constant, linear, or quadratic function.
+This is because the cost of approximating a more complex function for each instance
+is too high, and simple approximations normally do a good job for a sufficiently
+small subregion.
+
+\textbf{Gaussian Kernal:}
+$$K(x_a, x_b) \equiv e^{\frac{-D(x_a - x_b)}{2\sigma^2}}$$
+We can apply a gaussian to R data points, add these gaussians
+together, the divide this gaussian by n and we get a pdf for
+predicting y given x\\
+By changing $\sigma$ on the gaussians we can get kernal smoothing.
+
+
+\textbf{Radial Basis Functions}
+
+RBF netowrks are a type of ANN constructed from spatially localized
+kernal function. These can be seen as a blend of instance-based
+approaches (spatially localized influence of each kernal function) and
+neural network approaches (a global approximation to the
+target function is formed at training time rather than a local
+approximation
+at query time). RBF networks have been used successfully in applications such as interpreting
+visual scenes, in which the assumption of spatially
+local influences is well justified.
+
+\textbf{Remarks on Lazy and eager learning:}
+
+Lazy methods normally require low computation time during learning
+but high computation at query time.
+Lazy methods consider each query when deciding how to generalize beyond the
+training examples, eager methods cannot do this. Before seeing the any queries
+the eager methods choose a global generalization.
+
+This means that lazy methods use a more expressive hypothesis space. 
+Local methods can represent a global approximation by a collection of 
+small approximations. 
+
+\end{question}
+
+\begin{question}{Genetic Algorithms}
+Good things about GA:
+\begin{itemize}
+    \item Evolution is know to be successful\\
+    \item GAs can search spaces of hypothesis containing complex interacting
+    parts, where the impact of each part on overall hypothesis fitness may be difficult
+    to model \\
+    \item GA are easily parallelized\\
+\end{itemize}
+Elements of a GA:
+\begin{itemize}
+    \item \textbf{Representation}: A way to represent a hypothesis (normally a bitstring)\\
+    \item \textbf{Population}: a collection of hypothesis \\
+    \item \textbf{Fitness function}: A function that evaluates the quality of a hypothesis\\
+    \item \textbf{Crossover operation}: Given two parents, a crossover operation creates
+                        two children. The crossover operation should only produce
+                        valid children\\
+    \item \textbf{Mutation}: The way in which hypothesis can mutate, and the rate at which
+                            mutate.\\
+    \item \textbf{Rate of replacement}: A rate that determines how much of the population
+                            will be removed at each generation.
+\end{itemize}
+
+TODO: Soft/Hard bias of GA
+\end{question}
+
+\begin{question}{Reinforcement Learning}
+
+We want to learn the \textbf{control policy} which is a function from
+the state space to actions: $$ \pi : S \rightarrow A$$
+which outputs an appropriate action $a \in A$ given a state $s \in S$
+
+Reinforcement learning differs from other function approximations in:
+\begin{itemize}
+    \item \emph{Delayed Reward:} For normal functions we having training
+        data of the form $(d, f(d))$, but in reinforcement learning this
+        is not the case.  This introduces the problem of \emph{temporal credit
+        assignment}: determining which of the actions in its sequence are
+        to be credited with producing the eventual rewards.\\
+    \item \emph{Exploration:} The learner faces a tradeoff in choosing
+        whether to favor exploration of unknown
+        states and actions (to gather new information), or exploitation of states
+        and actions that it has already learned will yeild high reward.\\
+    \item \emph{Partially observable states:} May not be able to completely determin the state\\
+    \item \emph{Lifelong learning: Learning never ends} 
+\end{itemize}
+
+Cumulative value with respect to an arbitrary policy $\pi$:
+
+$$ V^{\pi}(s_t) = r_t + \gamma r_{t+1} + \gamma^2 r_{t+2} ..$$
+
+This equation is normally called the \emph{discounted cumulative reward}
+
+Instead of the discounted cumulative reward we could use the \emph{finite horizon}
+$\sum^h r_{t+i}$ or the \emph{average reward} $lim_{h\rightarrow \infty} \frac{1}{h} \sum^h r_{t+i}$
+
+The task of learning is to find the \emph{optimal policy} $\pi^*$
+$$ \pi^* \equiv \arg\max_{\pi}V^{\pi}(s), (\forall s)$$
+
+We denote $V^{\pi^*}$ as $V^*$
+
+\textbf{Q-Learning}
+
+Each equation follows from the previous.
+$$Q(s,a) \equiv r(s,a) + \gamma V^*(\delta(s,a))$$
+$$ \pi^*(s) \equiv \arg\max_{a}Q(s,a)$$
+$$V^*(s) = \max_{a'} Q(s, a')$$
+$$\hat{Q}(s,a) \leftarrow r + \gamma \max_{a'}\hat{Q}(s', a')$$
+
+
+\end{question}
+
+
 \end{document}

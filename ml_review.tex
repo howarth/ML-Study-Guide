@@ -833,6 +833,29 @@ small approximations.
 \end{question}
 
 \begin{question}{Genetic Algorithms}
+Good things about GA:
+\begin{itemize}
+    \item Evolution is know to be successful\\
+    \item GAs can search spaces of hypothesis containing complex interacting
+    parts, where the impact of each part on overall hypothesis fitness may be difficult
+    to model \\
+    \item GA are easily parallelized\\
+\end{itemize}
+Elements of a GA:
+\begin{itemize}
+    \item \textbf{Representation}: A way to represent a hypothesis (normally a bitstring)\\
+    \item \textbf{Population}: a collection of hypothesis \\
+    \item \textbf{Fitness function}: A function that evaluates the quality of a hypothesis\\
+    \item \textbf{Crossover operation}: Given two parents, a crossover operation creates
+                        two children. The crossover operation should only produce
+                        valid children\\
+    \item \textbf{Mutation}: The way in which hypothesis can mutate, and the rate at which
+                            mutate.\\
+    \item \textbf{Rate of replacement}: A rate that determines how much of the population
+                            will be removed at each generation.
+\end{itemize}
+
+TODO: Soft/Hard bias of GA
 \end{question}
 
 \begin{question}{Reinforcement Learning}
@@ -853,7 +876,7 @@ Reinforcement learning differs from other function approximations in:
         states and actions (to gather new information), or exploitation of states
         and actions that it has already learned will yeild high reward.\\
     \item \emph{Partially observable states:} May not be able to completely determin the state\\
-    \item \emph{Lifelong learning:} 
+    \item \emph{Lifelong learning: Learning never ends} 
 \end{itemize}
 
 Cumulative value with respect to an arbitrary policy $\pi$:

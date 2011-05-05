@@ -648,6 +648,85 @@ For an arbitrary $\beta$, the upper bound on the number of mistakes necessary to
 \end{question}
 
 
+
+
+\begin{question}{Hidden Markov Models}
+
+Elements of the model:
+
+States: $S = \{ s_0, s_1,.. s_m \}$\\
+Transition probabilites: $P(q_t = s_i | q_{t-1} = s_j) = a_{ji}$\\
+Output probability distribution: $P(y_t = O_k | q_t = s_j) = b_{j}^(k)$
+
+\textbf{HMM Problems and Solutions:}
+
+\underline{Evaluation:}\\
+We want to compute the probability of observation sequence given a model. We use the
+\emph{forward algorithms} and \emph{Viterbi algorithm}
+
+\underline{Decoding:}\\
+We want to find the state sequence that is most probable given the observation sequence.
+We use the \emph{Viterbi algorithm} to do this.
+
+\underline{Training:}\\
+We want to find the model params (transition probabilities and emission probabilities)
+to maximize the probability of the observed sequences. The solution
+is the \emph{Forward-Backward Algorithm}
+
+\textbf{Forward Algorithm}\\
+$\alpha_t(j) = P(O_1 O_2 ... O_t, q_t = s_j | \lambda)$
+
+$\alpha_0(j) = \text{ 1 if j start state, 0 otherwise}$\\
+$\alpha_t(j) = \bigg{[}\sum^N\alpha_{t-1}(i)a_{ij}\bigg{]}b_j(O_t)$
+
+$P(O|\lambda) = \alpha_T(S_N)$\\
+Computation is $O(N^2T)$
+
+\textbf{Backward Algorithm}\\
+    $\beta_t(i) = P(O_{t+1}O_{t+2}..O_T | q_t = s_i, \lambda)$
+
+    $\beta_T(i) = \text{ 1 if i is end state 0 otherwise}$\\
+    $\beta_t(i) = \sum_j^N a_{ij}b_j(O_{t+1})\beta_{t+1}(j)$\\
+
+    $P(O|\lambda) = \beta_0(S_0) = \alpha_T(S_N)$ 
+
+\textbf{Viterbi Algorithm}\\
+    Find state sequence $Q$ wich maximizes $P(O, Q|\lambda)$
+
+    $VP_t(i) = MAX_{q_0,..q_{t-1}} P(O_1O_2 ... O_t, q_t = i | \lambda)$\\
+    $VP_t(j) = MAX_{i=0, ... N} VP_{t-1}(i) a_{ij}b_j(O_t)$
+
+    $P(O, Q | \lambda) = VP_T(s_N)$
+
+\textbf{Training HMM parameters}\\
+Tune $\lambda$ to maximize $P(O|\lambda)$\\
+No efficient algorithm for global optimum\\
+Efficient iterative algorithm finds local optimum\\
+The \emph{Baum-welch (forward-backward) re-estimation} Computes the probabilities
+for $\lambda$, then refines the estimation based on computed values from forward backward
+algorithm.
+
+\textbf{Forward-Backward Algorithm}\\
+$\xi(i,j) = $ the probability of transiting from $s_i$ to $s_j$ at time t given O\\
+$\xi(i,j) = P(q_t = s_i, q_{t+1} = s_j| O, \lambda) = \frac{\alpha_t(i)a_{ij}b_j(O_{t+1})\beta_{t+1}(j)}{P(O|\lambda)}$ 
+
+\textbf{Baum-Welch Reestimation}\\
+$\hat{a}_{ij} = \frac{ \text{expected number of trans from $s_i$ to $s_j$}}{\text{expected number of trans from $s_i$}}
+= \frac{\sum_{t=0}^{T-1} \xi_t(i,j)}{ \sum_{t=0}^{T-1}\sum_{j=0}^{N} \xi_t(i,j)}$
+
+$\hat{b}_j(k) = \frac{\text{expected number of times in state j with symbol k}}{\text{expected number of times in state j}}
+= \frac{\sum_{t:O_t=k} \sum_{i=0}^N \xi_t(i,j) }{\sum_{t=0}^{T-1}\sum_{i=0}^{N} \xi_t(i,j)}$
+
+We know that $P(O| \lambda^{c+1}) \ge P(O|\lambda^{c})$
+
+
+
+\end{question}
+
+
+
+
+
 \begin{question}{Instance-Based Learning}
 
 What sets local methods apart from what we've learned:
@@ -719,7 +798,25 @@ This is because the cost of approximating a more complex function for each insta
 is too high, and simple approximations normally do a good job for a sufficiently
 small subregion.
 
-TODO: RADIAL BASED FUNCTION
+\textbf{Gaussian Kernal:}
+$$K(x_a, x_b) \equiv e^{\frac{-D(x_a - x_b)}{2\sigma^2}}$$
+We can apply a gaussian to R data points, add these gaussians
+together, the divide this gaussian by n and we get a pdf for
+predicting y given x\\
+By changing $\sigma$ on the gaussians we can get kernal smoothing.
+
+
+\textbf{Radial Basis Functions}
+
+RBF netowrks are a type of ANN constructed from spatially localized
+kernal function. These can be seen as a blend of instance-based
+approaches (spatially localized influence of each kernal function) and
+neural network approaches (a global approximation to the
+target function is formed at training time rather than a local
+approximation
+at query time). RBF networks have been used successfully in applications such as interpreting
+visual scenes, in which the assumption of spatially
+local influences is well justified.
 
 \textbf{Remarks on Lazy and eager learning:}
 
@@ -733,6 +830,9 @@ This means that lazy methods use a more expressive hypothesis space.
 Local methods can represent a global approximation by a collection of 
 small approximations. 
 
+\end{question}
+
+\begin{question}{Genetic Algorithms}
 \end{question}
 
 \begin{question}{Reinforcement Learning}
@@ -759,6 +859,24 @@ Reinforcement learning differs from other function approximations in:
 Cumulative value with respect to an arbitrary policy $\pi$:
 
 $$ V^{\pi}(s_t) = r_t + \gamma r_{t+1} + \gamma^2 r_{t+2} ..$$
+
+This equation is normally called the \emph{discounted cumulative reward}
+
+Instead of the discounted cumulative reward we could use the \emph{finite horizon}
+$\sum^h r_{t+i}$ or the \emph{average reward} $lim_{h\rightarrow \infty} \frac{1}{h} \sum^h r_{t+i}$
+
+The task of learning is to find the \emph{optimal policy} $\pi^*$
+$$ \pi^* \equiv \arg\max_{\pi}V^{\pi}(s), (\forall s)$$
+
+We denote $V^{\pi^*}$ as $V^*$
+
+\textbf{Q-Learning}
+
+Each equation follows from the previous.
+$$Q(s,a) \equiv r(s,a) + \gamma V^*(\delta(s,a))$$
+$$ \pi^*(s) \equiv \arg\max_{a}Q(s,a)$$
+$$V^*(s) = \max_{a'} Q(s, a')$$
+$$\hat{Q}(s,a) \leftarrow r + \gamma \max_{a'}\hat{Q}(s', a')$$
 
 
 \end{question}

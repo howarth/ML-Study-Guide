@@ -41,7 +41,6 @@
 \newcommand{\course}{Final Review 10-601 Machine Learning S11}
 \newcommand{\andrewid}{dhowarth, mwgreave}
 \newcommand{\myandrew}{dhowarth@andrew.cmu.edu, mwgreave@andrew.cmu.edu}
-\newcommand{\myhwnum}{1}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \pagestyle{fancyplain}
 \chead{\course}
@@ -55,19 +54,19 @@ Created by Dan Howarth and Malcolm Greaves. Adapted significantly from ``Machine
 \\
 Table of Contents:
 \begin{itemize}
-	\item Overview of Learning
-	\item Concept Learning
-	\item Information Theory
-	\item Decision Trees
-	\item Artificial Neural Networks
-	\item Computational Learning Theory
-	\item Evaluating and Comparing Hypotheses
-	\item Bayesian Statistics and the Naive Bayes Classifier
-	\item Bayes Networks and Expectation Maximization
-	\item Hidden Markov Models
-	\item Instance Based Learning
-	\item Reinforcement Learning
-	\item Genetic Algorithms
+	\item (1) Overview of Learning
+	\item (2) Concept Learning
+	\item (3) Information Theory
+	\item (4) Decision Trees
+	\item (4) Artificial Neural Networks
+	\item (5) Computational Learning Theory
+	\item (6) Evaluating and Comparing Hypotheses
+	\item (7) Bayesian Statistics and the Naive Bayes Classifier
+	\item (8) Bayes Networks and Expectation Maximization
+	\item (9) Hidden Markov Models
+	\item (10) Instance Based Learning
+	\item (11) Reinforcement Learning
+	\item (12) Genetic Algorithms
 \end{itemize}
 \begin{question}{Overview of learning}
 \textbf{Definition} A computer program is said to \textbf{learn} from experience $E$, with respect to some class of tasks $T$ and performance measure $P$, if the program's performance at tasks in $T$, as measured by $P$, improves with experience $E$. (Mitchell, p2)
@@ -786,7 +785,24 @@ For an arbitrary $\beta$, the upper bound on the number of mistakes necessary to
 \end{question}
 
 \begin{question}{Bayes Networks and Expectation Maximization}
-	
+
+	\textbf{Bayesian belief networks} are nestled in-between optimal Bayes and naive Bayes. In the optimal Bayes setting, we make no conditional independence assumptions. In the naive Bayes setting, we assume that all attributes are conditionally independent of the class. In a Bayesian belief network, we use our domain knowledge and specify the conditional independence assumptions that are relevant to the problem.
+	\\
+	\\
+	A belief network is a directed, acyclic graph, where each attribute is a vertex and an edge from vertex A to vertex B represents the influence that attribute A has on attribute B. The edge specifies the conditional relationship between two variables.
+	\\
+	A variable in the network is conditionally independent of all of its nondescendants in the network given its immediate predecessors (parents).
+	\\
+	\\
+	Bayesian belief networks describe the probability distribution over a set of random variables $Y_1, \ldots, Y_n$. Each random variable can take on a set of values $V(Y_i)$; we define the \textit{joint space} of these variables as the cross product $V(Y_1) \times \ldots \times V(Y_n)$. The probability distribution over $V(Y_1) \times \ldots \times V(Y_n)$ is known as the \textbf{joint probability distribution} of the random variable $\langle Y_1, \ldots, Y_n \rangle$. \textit{Bayesian belief networks describe the joint probability distribution for a set of variables.}
+	\\
+	\\
+	Thus, the joint probability is defined as 
+	$$P(y_1, y_2, \ldots, y_n) = \prod_{i=1}^{n}{P(y_i | Parents(Y_i))}$$
+	Where each $y_i$ represents the a value for random variable $Y_i$, and $Parents(Y_i)$ denotes the set of immediate predecessors (parents) of $Y_i$ as defined in the Bayesian belief network. For the case where a node has no parents in the network, then it has 
+	\\
+	\\
+	\textbf{Inference} in a Bayesian belief network is known to be NP-Hard. However, there are a number of approximate inference algorithms that do a good job at inferring the probability distributions of variables in the network from the known values of other variables in the network. 
 
 
 \textbf{The EM Algorithm}
@@ -868,7 +884,7 @@ Computation is $O(N^2T)$
     $P(O|\lambda) = \beta_0(S_0) = \alpha_T(S_N)$ 
 
 \textbf{Viterbi Algorithm}\\
-    Find state sequence $Q$ wich maximizes $P(O, Q|\lambda)$
+    Find state sequence $Q$ which maximizes $P(O, Q|\lambda)$
 
     $VP_t(i) = MAX_{q_0,..q_{t-1}} P(O_1O_2 ... O_t, q_t = i | \lambda)$\\
     $VP_t(j) = MAX_{i=0, ... N} VP_{t-1}(i) a_{ij}b_j(O_t)$
@@ -887,7 +903,7 @@ algorithm.
 $\xi(i,j) = $ the probability of transiting from $s_i$ to $s_j$ at time t given O\\
 $\xi(i,j) = P(q_t = s_i, q_{t+1} = s_j| O, \lambda) = \frac{\alpha_t(i)a_{ij}b_j(O_{t+1})\beta_{t+1}(j)}{P(O|\lambda)}$ 
 
-\textbf{Baum-Welch Reestimation}\\
+\textbf{Baum-Welch Re estimation}\\
 $\hat{a}_{ij} = \frac{ \text{expected number of trans from $s_i$ to $s_j$}}{\text{expected number of trans from $s_i$}}
 = \frac{\sum_{t=0}^{T-1} \xi_t(i,j)}{ \sum_{t=0}^{T-1}\sum_{j=0}^{N} \xi_t(i,j)}$
 
@@ -925,7 +941,7 @@ the K nearest neighbors.
 
 \underline{Distance weighted KNN}
 
-Similair to KNN, but add a weight factor to each vote that is inversely proportional
+Similar to KNN, but add a weight factor to each vote that is inversely proportional
 to distance. For example:
 
 $$w_i \equiv \frac{1}{d(x_q, x_i)^2}$$
@@ -939,11 +955,11 @@ have value $c$, then the new classification will be $c$ as well.
 
 \textbf{Induction bias:} We assume that the classification of a query point
 is most likely to be the classification of instances close in
-Eucledian distance.
+Euclidean distance.
 
 Given a large enough training set it is robust to noisy training data.
 This is because a few incorrect votes here an there will not have
-a significant effect on classfication.
+a significant effect on classification.
 
 A practical issue of KNN is that we need to calculate distance based on
 all attributes of distance.
@@ -951,9 +967,9 @@ all attributes of distance.
 \textbf{Curse of Dimensionality:} Each attribute is represented in a dimension. If there
 are many irrelevant (or even if there are a few) attributes then it can possibly
 skew our distance measure. It is possible that two points may be close when 
-considering irrelevent attributes, but much farther when only considering
-relevent attributes. To fix this we can shorten the axis of irrelevant dimensions.
-This can be done by learning a weight for each dimension. It may also be benificial
+considering irrelevant attributes, but much farther when only considering
+relevant attributes. To fix this we can shorten the axis of irrelevant dimensions.
+This can be done by learning a weight for each dimension. It may also be beneficial
 to completely remove some attributes.
 
 
@@ -970,7 +986,7 @@ We can combine KNN and regression by:
     \item Combine both, weight K nearest neighbors with a kernel function \\
 \end{itemize}
 
-In most cases the functon is approximated by a constant, linear, or quadratic function.
+In most cases the function is approximated by a constant, linear, or quadratic function.
 This is because the cost of approximating a more complex function for each instance
 is too high, and simple approximations normally do a good job for a sufficiently
 small subregion.
@@ -985,7 +1001,11 @@ By changing $\sigma$ on the gaussians we can get kernel smoothing.
 
 \textbf{Radial Basis Functions}
 
+<<<<<<< HEAD
 RBF netowrks are a type of ANN constructed from spatially localized
+=======
+RBF networks are a type of ANN constructed from spatially localized
+>>>>>>> 0a34b5870bbf8e0c32c6e37780ade6e54c49ae71
 kernel function. These can be seen as a blend of instance-based
 approaches (spatially localized influence of each kernel function) and
 neural network approaches (a global approximation to the
@@ -1010,6 +1030,7 @@ small approximations.
 \end{question}
 
 \begin{question}{Genetic Algorithms}
+<<<<<<< HEAD
 \textbf{Good things about GA:}\\
 Evolution is know to be successful\\
 GAs can search spaces of hypothesis containing complex interacting
@@ -1022,6 +1043,22 @@ Elements of a GA:\\
     \textbf{Population}: a collection of hypothesis \\
     \textbf{Fitness function}: A function that evaluates the quality of a hypothesis\\
     \textbf{Crossover operation}: Given two parents, a crossover operation creates
+=======
+Good things about GA:
+\begin{itemize}
+    \item Evolution is know to be successful\\
+    \item GAs can search spaces of hypothesis containing complex interacting
+    parts, where the impact of each part on overall hypothesis fitness may be difficult
+    to model \\
+    \item GA are easily parallelized\\
+\end{itemize}
+Elements of a GA:
+\begin{itemize}
+    \item \textbf{Representation}: A way to represent a hypothesis (normally a bit string)\\
+    \item \textbf{Population}: a collection of hypothesis \\
+    \item \textbf{Fitness function}: A function that evaluates the quality of a hypothesis\\
+    \item \textbf{Crossover operation}: Given two parents, a crossover operation creates
+>>>>>>> 0a34b5870bbf8e0c32c6e37780ade6e54c49ae71
                         two children. The crossover operation should only produce
                         valid children\\
     \textbf{Mutation}: The way in which hypothesis can mutate, and the rate at which
@@ -1050,8 +1087,8 @@ Reinforcement learning differs from other function approximations in:
     \item \emph{Exploration:} The learner faces a tradeoff in choosing
         whether to favor exploration of unknown
         states and actions (to gather new information), or exploitation of states
-        and actions that it has already learned will yeild high reward.\\
-    \item \emph{Partially observable states:} May not be able to completely determin the state\\
+        and actions that it has already learned will yield high reward.\\
+    \item \emph{Partially observable states:} May not be able to completely determine the state\\
     \item \emph{Lifelong learning: Learning never ends} 
 \end{itemize}
 
@@ -1087,10 +1124,15 @@ Bagging  = \textbf{B}ootstrap \textbf{agg}regat\textbf{ing}
 The general procedure of bagging is to first take the training data and divide it
 into a training set and test set, and repeat this process some N times. We then train
 a learner on all sets. The learner could be the same for all sets, or they can be different.
-When trying to find the mapping for a new example, we run the example agaisnt all
+When trying to find the mapping for a new example, we run the example against all
 N learners, and take a (weighted) majority vote.
 
+<<<<<<< HEAD
 With bagging the expected error for the aggredated hypothesis is lower
+=======
+TO TALK BOUT: Variance of error
+With bagging the expected error for the aggregated hypothesis is lower
+>>>>>>> 0a34b5870bbf8e0c32c6e37780ade6e54c49ae71
 than the expected value for an individual hypothesis.
 
 

@@ -34,6 +34,8 @@
 %% pretty when you compile it.                           %%
 %%     DO NOT PUT YOUR NAME ANYWHERE ELSE!!!!            %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\argmax}{\arg\max}
+\newcommand{\argmin}{\arg\min}
 \newcommand{\myname}{Daniel Howarth, Malcolm Greaves}
 \newcommand{\assignment}{Final Review}
 \newcommand{\course}{Final Review 10-601 Machine Learning S11}
@@ -60,8 +62,8 @@ Table of Contents:
 	\item Artificial Neural Networks
 	\item Computational Learning Theory
 	\item Evaluating and Comparing Hypotheses
-	\item Bayesian Statistics
-	\item Naive Bayes Classifier and Bayes Networks
+	\item Bayesian Statistics and the Naive Bayes Classifier
+	\item Bayes Networks and Expectation Maximization
 	\item Hidden Markov Models
 	\item Instance Based Learning
 	\item Reinforcement Learning
@@ -727,7 +729,66 @@ For an arbitrary $\beta$, the upper bound on the number of mistakes necessary to
 		\item The \textbf{standard deviation} of a random variable $Y$ is defined as the square root of the variance of $Y$. 
 	\end{itemize}
 \end{question}
-=======
+
+
+\begin{question}{Bayesian Learning and the Naive Bayes Classifier}
+	Bayesian inference gives us a probabilistic framework for inference. We assume that the quantities of interest are governed by probability distributions, and reasoning about these distributions with observed data can yield us optimal decisions.
+	\\
+	\\
+	At the core of Bayesian learning methods is \textbf{Bayes' Theorem}, which allows us to calculate the probability of a hypothesis based upon the prior probability of the hypothesis, the probability of observing the training data given that the hypothesis is true, and the probability of observing the training data. We define the prior as $P(h)$, the likelihood of observing the data given the hypothesis as $P(D|h)$, and the probability of observing the data as $P(D)$. With these three quantities, we can calculate the posterior probability of the hypothesis given the data, $P(h|D)$, as 
+	$$P(h|D) = \frac{P(h)P(D|h)}{P(D)}$$
+	\\
+	\\
+	From Bayes' theorem, we can find the maximal posterior hypothesis, or the \textbf{maximum a posteriori (MAP)} hypothesis. 
+	$$h_{MAP} = \argmax_{h \in H} P(h|D) = \argmax_{h \in H} P(D|h) P(h)$$
+		We say that a learning algorithm is a \textbf{consistent learner} iff the learner outputs a hypothesis that commits zero errors over the training examples. Moreover, every consistent learner outputs a MAP hypothesis if we assume that the prior on each hypothesis is equal and if we assume noise-free, deterministic training data.
+	\\
+	\\
+	If we assume that every hypothesis in $H$ has equal probability--the prior on each hypothesis is equal, then the MAP hypothesis is known as the \textbf{maximum likelihood (ML)} hypothesis. 
+	$$h_{ML} = \argmax_{h \in H} P(D|h)$$
+	
+	In the case where we assume that that probability distribution underlying the data has Normally distributed noise (with zero mean), we have a different derivation for the ML hypothesis:
+	$$h_{ML} = \argmin_{h \in H} \sum_{i=1}^{m}{(d(x_i) - h(x_i))^2}$$
+	Where $d(x_i)$ is the value of the $i^{\text{th}}$ training example out of $m$ training examples and $h(x_i)$ is the hypothesis' label for this example.
+	\\
+	\\
+	In light of Occam's Razor, we are motivated to find the simplest hypothesis to explain the data. The \textbf{Minimum Description Length} principle is the MAP hypothesis interpreted in the context of information theory:
+	\begin{eqnarray}
+		h_{MAP} &=& \argmax_{h \in H} P(D|h)P(h)\\
+						&=& \argmax_{h \in H} \log_2 P(D|h) + \log_2 P(h)\\
+						&=& \argmin_{h \in H} -\log_2 P(D|h) - \log_2 P(h)
+	\end{eqnarray}
+	We see that $-\log_2 P(h)$ is the number of bits necessary to encode $h$ under the optimal encoding of the hypothesis space $H$. We use the notation $L_{C_H}(h)$. We also see that $-\log_2 P(D|h)$ is the minimum description length of the training data given the hypothesis $h$. We denote this quantity as $L_{C_{D|h}}(D|h)$. Thus, the \textbf{minimum description length hypothesis} is: 
+	$$h_{MDL} = \argmin_{h \in H} L_{C_1}(h) + L_{C_2}(D|h)$$
+	Where $C_1, C_2$ are the encoding schemas for the hypothesis space and data, given the hypothesis, respectively. If we let $C_1$ to be $C_H$ and $C_2$ to be $C_{D|h}$, then we see that $h_{MDL} = h_{MAP}$.
+	\\
+	\\
+	The \textbf{Bayes optimal classification} is the most probable classification of an unobserved instance, given the training data. The most probable classification is calculated by combining the predictions of all hypotheses ($P(v_j|h_i)$), each weighted by their respective posterior probabilities ($P(h_i|D)$).
+	$$v_{optimal} = \argmax_{v_j \in V} \sum_{h_i \in H}{P(v_j|h_i)P(h_i|D)}$$
+	\\
+	\\
+	The \textbf{Gibbs algorithm} is very simple: choose a hypothesis according to the probability distribution governing the hypothesis space and then use this hypothesis to predict the value of the next unobserved instance. Repeat for each new instance. Although this algorithm is extremely simple, it has been shown that, if each hypothesis is equally likely, then the expected error of the Gibbs algorithm is at most twice that of the Bayes' optimal classifier.
+	\\
+	\\
+	One serious problem with optimal Bayes learning, however, is that we need exponential time in order to compute \textit{one} classification. Each hypothesis has $n$ attributes that are used to describe the hypothesis. Thus $P(v_j|h) = P(v_j|a_1, a_2, \ldots, a_n)$. In the case where each attribute is boolean, we have that our hypothesis space is $2^n$. Thus, maximizing over the hypothesis space will take exponential time.
+	\\
+	\\
+	In order to ameliorate our exponential time issues with optimal Bayes learning, we can assume that the attribute values are conditionally independent given the target value. That is, $P(a_1, \ldots, a_n | v_j) = \prod_{i=1}^{n}{P(a_i|v_j)}$. Given this assumption, we have the \textbf{Naive Bayes Classifier}:
+	$$v_{NB} = \argmax_{v_j \in V} P(v_j) \prod_{i}^{n}{P(a_i|v_j)}$$
+	When we use a Naive Bayes Classifier in practice, we must estimate each prior and likelihood term. Often, the best way to do this is to use the relative frequencies of each term as provided by the labeled training data. Thus, $P(v_j)$ is the frequency of instances that have label $v_j$ to all instances, and any $P(a_i|v_j)$ term is the frequency of the instances that have attribute value $a_i$ to all instances that have label $v_j$. 
+	\textbf{Probability Formulas}
+	\begin{itemize}
+		\item \textit{Independence} If events $A,B$ are independent then $P(A|B) = P(A)$ and $P(B|A) = P(B)$. Note that mutually exclusive events are, by definition, dependent upon one another.
+		\item \textit{Product Rule}: $P(A \wedge B) = P(B)P(A|B) = P(A)P(B|A)$
+		\item \textit{Sum Rule}: $P(A \vee B) = P(A) + P(B) - P(A \wedge B)$
+		\item \textit{Marginalization}: Let events $A_1, \ldots, A_n$ partition the universal set. Then we have, for any event $B$, $P(B) = \sum_{i=1}^{n}{P(A_i)P(B|A_i)}$
+	\end{itemize}
+\end{question}
+
+\begin{question}{Bayes Networks and Expectation Maximization}
+	
+\end{question}
+
 
 
 
@@ -736,7 +797,7 @@ For an arbitrary $\beta$, the upper bound on the number of mistakes necessary to
 Elements of the model:
 
 States: $S = \{ s_0, s_1,.. s_m \}$\\
-Transition probabilites: $P(q_t = s_i | q_{t-1} = s_j) = a_{ji}$\\
+Transition probabilities: $P(q_t = s_i | q_{t-1} = s_j) = a_{ji}$\\
 Output probability distribution: $P(y_t = O_k | q_t = s_j) = b_{j}^(k)$
 
 \textbf{HMM Problems and Solutions:}
